@@ -1,4 +1,5 @@
 #!/usr/bin/perl 
+
 =pod
 
 =encoding utf8
@@ -32,6 +33,7 @@ novel_to_any.pl -s [site] -o [query_detail] -m [select_menu_or_not] -t [novel_sa
 -t : 小说保存指令，URL信息以 {url} 指定
 
 =cut
+
 use strict;
 use warnings;
 use utf8;
@@ -46,28 +48,32 @@ $| = 1;
 
 my %opt;
 getopt( 'wsomt', \%opt );
+
 #w : writer
 #s(query) : site
 #o : writer option / query info
 #m : select menu
 #t : to txt / to html / to wordpress ...
 
-my $cmd = $opt{w} ? qq[novel_writer_to_json.pl $opt{w} $opt{o}] : qq[novel_query_to_json.pl $opt{s} $opt{o}];
+my $cmd =
+    $opt{w}
+    ? qq[novel_writer_to_json.pl $opt{w} $opt{o}]
+    : qq[novel_query_to_json.pl $opt{s} $opt{o}];
 print $cmd;
 my $json = `$cmd`;
-my $info = decode_json( $json );
+my $info = decode_json($json);
 
-my $select = $opt{m} ? select_book($info) : $info; 
-print $_->[2],"\n" for @$select;
-for my $r (@$select){
+my $select = $opt{m} ? select_book($info) : $info;
+print $_->[2], "\n" for @$select;
+for my $r (@$select) {
     my $u = $r->[2];
     my $c = $opt{t};
-    $c=~s/{url}/$u/;
+    $c =~ s/{url}/$u/;
     system($c);
-}
+} ## end for my $r (@$select)
 
 sub select_book {
-    my ($info_ref ) = @_;
+    my ($info_ref) = @_;
 
     my %menu = ( 'Select' => 'Many', 'Banner' => 'Book List', );
 

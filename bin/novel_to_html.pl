@@ -1,4 +1,5 @@
 #!/usr/bin/perl 
+
 =pod
 
 =encoding utf8
@@ -23,32 +24,49 @@ use strict;
 use warnings;
 use utf8;
 
-use HTML::TreeBuilder;
-use HTML::FormatText;
-
-
-
+use Novel::Robot::Packer;
 use Novel::Robot;
 
 use Encode::Locale;
 use Encode;
 
-
-$|=1;
+$| = 1;
 
 my ($index_url) = @ARGV;
 
-my $xs = Novel::Robot->new();
+my $xs     = Novel::Robot->new();
+my $packer = Novel::Robot::Packer->new();
+$packer->set_packer('HTML');
+
+#sub gen_book {
+#my ( $self, $index_url ) = @_;
+
+#my $index_ref = $self->get_index_ref($index_url);
+#$self->{packer}->format_before_index($index_ref);
+#$self->{packer}->format_index($index_ref);
+
+#for my $i ( 1 .. $index_ref->{chapter_num} ) {
+#my $u = $index_ref->{chapter_urls}[$i];
+#next unless ($u);
+
+#print "\rget book to html : chapter $i/$index_ref->{chapter_num} : $u";
+#my $chap_ref = $self->get_chapter_ref( $u, $i );
+
+#my $floor = $self->{packer}->format_chapter($chap_ref);
+#} ## end for my $i ( 1 .. $index_ref...)
+
+#} ## end sub gen_book
+
 print "\rget book to html : $index_url";
 my $index_ref = $xs->get_index_ref($index_url);
-exit unless($index_ref);
+exit unless ($index_ref);
 
-my $filename = encode( locale  => "$index_ref->{writer}-$index_ref->{book}.html");
+my $filename = encode( locale => "$index_ref->{writer}-$index_ref->{book}.html" );
 open my $fh, '>:utf8', $filename;
 
-my $css = get_css();
-my $toc = generate_toc($index_ref);
-my $title = "$index_ref->{writer} 《$index_ref->{book}》";
+my $css        = get_css();
+my $index_html = $packer->format_index($index_ref);
+my $title      = "$index_ref->{writer} 《$index_ref->{book}》";
 print $fh <<__HTML__;
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
 <html>
@@ -60,35 +78,25 @@ $css
 </style>
 </head>
 <body>
-<div id="title"><a href="$index_url"> $title </a></div>
-<div id="toc"><ol>
-$toc
-</ol></div>
+$index_html
 <div id="content">
 __HTML__
 
-for my $i (1 .. $index_ref->{chapter_num}){
+for my $i ( 1 .. $index_ref->{chapter_num} ) {
     my $u = $index_ref->{chapter_urls}[$i];
-    next unless($u);
+    next unless ($u);
 
     print "\rget book to html : chapter $i/$index_ref->{chapter_num} : $u";
-    my $chap_ref = $xs->get_chapter_ref($u, $i);
+    my $chap_ref = $xs->get_chapter_ref( $u, $i );
 
-    my $j = sprintf ( "%03d# ", $i );
-    my $floor = <<__FLOOR__;
-<div class="floor">
-<div class="fltitle">$j<a name="toc$i">$chap_ref->{chapter}</a></div>
-<div class="flcontent">$chap_ref->{content}</div>
-</div>
-__FLOOR__
-    print $fh $floor,"\n";
-}
+    my $floor = $packer->format_chapter($chap_ref);
+    print $fh $floor, "\n";
+} ## end for my $i ( 1 .. $index_ref...)
 print $fh "</div></body></html>";
 close $fh;
 print "\n";
 
-sub get_css
-{
+sub get_css {
     my $css = <<__CSS__;
 body {
 	font-size: large;
@@ -109,15 +117,15 @@ body {
 #title { text-align: center; }
 __CSS__
     return $css;
-} ## end sub read_css
+} ## end sub get_css
 
 sub generate_toc {
     my ($r) = @_;
-    my $toc='';
-for my $i (1 .. $index_ref->{chapter_num}){
-    my $u = $index_ref->{chapter_urls}[$i];
-    next unless($u);
-    $toc.=qq`<li><a href="#toc$i">$r->{chapter_info}[$i-1]{title}</a></li>\n`;
+    my $toc = '';
+    for my $i ( 1 .. $index_ref->{chapter_num} ) {
+        my $u = $index_ref->{chapter_urls}[$i];
+        next unless ($u);
+        $toc .= qq`<li><a href="#toc$i">$r->{chapter_info}[$i-1]{title}</a></li>\n`;
     }
     return $toc;
-}
+} ## end sub generate_toc

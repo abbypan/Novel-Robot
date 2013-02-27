@@ -105,6 +105,7 @@ use Moo;
 
 use Novel::Robot::Browser;
 use Novel::Robot::Parser;
+#use Novel::Robot::Packer;
 
 has browser => (
     is      => 'rw',
@@ -120,19 +121,25 @@ has site => (
     default => sub {''},
 );
 
-has parser => (
-    is      => 'rw',
+has parser_base => (
+    is => 'ro', 
     default => sub {
         my ($self) = @_;
         my $parser_base = new Novel::Robot::Parser();
-        my $parser = $parser_base->init_parser('Base');
-        return $parser;
-    },
+        return $parser_base;
+    }, 
 );
 
+has parser => (
+    is      => 'rw',
+);
+
+
 sub set_site {
-    my ( $self, $site ) = @_;
+    my ( $self, $s ) = @_;
+    my $site = $self->{parser_base}->detect_site($s);
     $self->{site} = $site if ($site);
+
     unless($self->{parser_list}{ $self->{site} }){
         my $parser_base = new Novel::Robot::Parser();
         $self->{parser_list}{ $self->{site} }
@@ -141,19 +148,11 @@ sub set_site {
     $self->{parser} = $self->{parser_list}{ $self->{site} };
 } ## end sub set_site
 
-sub set_site_by_url {
-    my ( $self, $url ) = @_;
-
-    my $site = $self->{parser}->detect_site_by_url($url);
-    
-    $self->set_site($site) if ( !$self->{site} or $self->{site} ne $site );
-} ## end sub set_site_by_url
-
 sub get_index_ref {
 
     my ( $self, @args ) = @_;
 
-    $self->set_site_by_url( $args[0] ) if ( $args[0] =~ m#^http://# );
+    $self->set_site( $args[0] ) if ( $args[0] =~ m#^http://# );
 
     my ($index_url) = $self->{parser}->generate_index_url(@args);
 
@@ -180,7 +179,7 @@ sub get_index_ref {
 sub get_chapter_ref {
     my ( $self, @args ) = @_;
 
-    $self->set_site_by_url( $args[0] ) if ( $args[0] =~ m#^http://# );
+    $self->set_site( $args[0] ) if ( $args[0] =~ m#^http://# );
 
     my ( $chap_url, $chap_id ) = $self->{parser}->generate_chapter_url(@args);
     my $html_ref = $self->{browser}->get_url_ref($chap_url);
@@ -212,7 +211,7 @@ sub get_empty_chapter_ref {
 sub get_writer_ref {
     my ( $self, @args ) = @_;
 
-    $self->set_site_by_url( $args[0] ) if ( $args[0] =~ m#^http://# );
+    $self->set_site( $args[0] ) if ( $args[0] =~ m#^http://# );
     my ($writer_url) = $self->{parser}->generate_writer_url(@args);
 
     my $html_ref = $self->{browser}->get_url_ref($writer_url);
