@@ -100,12 +100,14 @@ use strict;
 use warnings;
 use utf8;
 
+use Encode::Locale;
 use Encode;
+use Term::Menus;
 use Moo;
 
 use Novel::Robot::Browser;
 use Novel::Robot::Parser;
-#use Novel::Robot::Packer;
+use Novel::Robot::Packer;
 
 has browser => (
     is      => 'rw',
@@ -116,43 +118,74 @@ has browser => (
     },
 );
 
-has site => (
-    is      => 'rw',
-    default => sub {''},
-);
-
 has parser_base => (
-    is => 'ro', 
+    is      => 'ro',
     default => sub {
         my ($self) = @_;
         my $parser_base = new Novel::Robot::Parser();
         return $parser_base;
-    }, 
+    },
 );
 
-has parser => (
-    is      => 'rw',
+has parser => ( is => 'rw', );
+
+has packer_base => (
+    is      => 'ro',
+    default => sub {
+        my ($self) = @_;
+        my $packer_base = new Novel::Robot::Packer();
+        return $packer_base;
+    },
 );
 
+has packer => ( is => 'rw', );
 
-sub set_site {
-    my ( $self, $s ) = @_;
-    my $site = $self->{parser_base}->detect_site($s);
-    $self->{site} = $site if ($site);
+sub set_parser {
+    my ( $self, $s, $o ) = @_;
 
-    unless($self->{parser_list}{ $self->{site} }){
-        my $parser_base = new Novel::Robot::Parser();
-        $self->{parser_list}{ $self->{site} }
-        = $parser_base->init_parser($self->{site});
-    }
-    $self->{parser} = $self->{parser_list}{ $self->{site} };
-} ## end sub set_site
+    $self->{parser} = $self->{parser_base}->init_parser( $s, $o );
+
+} ## end sub set_parser
+
+sub set_packer {
+    my ( $self, $p, $o ) = @_;
+
+    $self->{packer} = $self->{packer_base}->init_packer( $p, $o );
+
+} ## end sub set_packer
+
+sub get_book {
+    my ( $self, $index_url, $o ) = @_;
+    $o ||= {};
+
+    print "\rget book : $index_url\n";
+
+    my $index_ref = $self->get_index_ref($index_url);
+    return unless ($index_ref);
+
+    $self->{packer}->open_packer($index_ref);
+
+    $self->{packer}->format_before_index($index_ref);
+    $self->{packer}->format_index($index_ref);
+    $self->{packer}->format_after_index($index_ref);
+
+    $self->{packer}->format_before_chapter($index_ref);
+    for my $i ( 1 .. $index_ref->{chapter_num} ) {
+        my $u = $index_ref->{chapter_urls}[$i];
+        next unless ($u);
+
+        print "\rget chapter $i/$index_ref->{chapter_num} : $u";
+        my $chap_ref = $self->get_chapter_ref( $u, $i );
+        $self->{packer}->format_chapter( $chap_ref, $i );
+    } ## end for my $i ( 1 .. $index_ref...)
+    $self->{packer}->format_after_chapter($index_ref);
+
+    $self->{packer}->close_packer();
+} ## end sub get_book
 
 sub get_index_ref {
 
     my ( $self, @args ) = @_;
-
-    $self->set_site( $args[0] ) if ( $args[0] =~ m#^http://# );
 
     my ($index_url) = $self->{parser}->generate_index_url(@args);
 
@@ -178,8 +211,6 @@ sub get_index_ref {
 
 sub get_chapter_ref {
     my ( $self, @args ) = @_;
-
-    $self->set_site( $args[0] ) if ( $args[0] =~ m#^http://# );
 
     my ( $chap_url, $chap_id ) = $self->{parser}->generate_chapter_url(@args);
     my $html_ref = $self->{browser}->get_url_ref($chap_url);
@@ -211,7 +242,6 @@ sub get_empty_chapter_ref {
 sub get_writer_ref {
     my ( $self, @args ) = @_;
 
-    $self->set_site( $args[0] ) if ( $args[0] =~ m#^http://# );
     my ($writer_url) = $self->{parser}->generate_writer_url(@args);
 
     my $html_ref = $self->{browser}->get_url_ref($writer_url);
@@ -241,6 +271,35 @@ sub get_query_ref {
 
     return $result;
 } ## end sub get_query_ref
+
+sub select_book {
+    my ($self, $info_ref) = @_;
+
+    my %menu = ( 'Select' => 'Many', 'Banner' => 'Book List', );
+
+    #菜单项，不搞层次了，恩
+    my %select;
+    my $i = 1;
+    for my $r (@$info_ref) {
+        my ( $info, $key, $url ) = @$r;
+        my $item = "$info --- $key";
+        $select{$item} = $url;
+        $item = encode( locale => $item );
+        $menu{"Item_$i"} = { Text => $item };
+        $i++;
+    } ## end for my $r (@$info_ref)
+
+    #最后选出来的小说
+    my @select_result;
+    for my $item ( &Menu( \%menu ) ) {
+        $item = decode( locale => $item );
+        my ( $info, $key ) = ( $item =~ /^(.*) --- (.*)$/ );
+        push @select_result, [ $info, $key, $select{$item} ];
+    }
+
+    return \@select_result;
+
+} ## end sub select_book
 
 ### }}}
 
