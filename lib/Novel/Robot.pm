@@ -162,7 +162,7 @@ sub get_book {
     my ( $self, $index_url, $o ) = @_;
     $o ||= {};
 
-    print "\rget book : $index_url\n";
+    #print "\rget book : $index_url\n";
 
     my $index_ref = $self->get_index_ref($index_url);
     return unless ($index_ref);
@@ -178,7 +178,7 @@ sub get_book {
         my $u = $index_ref->{chapter_urls}[$i];
         next unless ($u);
 
-        print "\rget chapter $i/$index_ref->{chapter_num} : $u";
+        #print "\rget chapter $i/$index_ref->{chapter_num} : $u";
         my $chap_ref = $self->get_chapter_ref( $u, $i );
         $self->{packer}->format_chapter( $chap_ref, $i );
     } ## end for my $i ( 1 .. $index_ref...)
