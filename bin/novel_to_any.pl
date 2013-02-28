@@ -6,7 +6,7 @@
 
 =head1 DESC
 
-TERM下面选择下载小说
+    TERM下面选择下载小说
 
 =head1 EXAMPLE
 
@@ -16,21 +16,21 @@ TERM下面选择下载小说
     
 =head1 USAGE
 
-novel_to_any.pl -w [writer_url] -m [select_menu_or_not] -t [packer_type]
+    novel_to_any.pl -w [writer_url] -m [select_menu_or_not] -t [packer_type]
 
-novel_to_any.pl -s [site] -q [query_keyword] -v [query_value] -m [select_menu_or_not] -t [packer_type]
+    novel_to_any.pl -s [site] -q [query_keyword] -v [query_value] -m [select_menu_or_not] -t [packer_type]
 
 =head1 OPTIONS
 
--w : 作者专栏URL
+    -w : 作者专栏URL
 
--s : 指定查询的站点
--q : 查询的类型
--v : 查询的关键字
+    -s : 指定查询的站点
+    -q : 查询的类型
+    -v : 查询的关键字
 
--m : 是否输出小说选择菜单
+    -m : 是否输出小说选择菜单
 
--t : 小说保存类型，例如TXT/HTML
+    -t : 小说保存类型，例如TXT/HTML
 
 =cut
 
