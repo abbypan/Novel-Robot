@@ -42,27 +42,33 @@ Dddbbb : 豆豆小说网 http://www.dddbbb.net
 
     novel_to_wordpress.pl -b "http://www.jjwxc.net/onebook.php?novelid=2456" -c 原创 -w http://xxx.xxx.com  -u xxx -p xxx
     
-    #批量处理小说(支持to txt/html/wordpress ...)
+    #批量处理小说(支持to TXT/HTML/...)
 
-    novel_to_any.pl -w "http://www.jjwxc.net/oneauthor.php?authorid=3243" -m 1 -t "novel_to_html.pl {url}"
+    NOVEL_TO_ANY.PL -W "HTTP://WWW.JJWXC.NET/ONEAUTHOR.PHP?AUTHORID=3243" -M 1 -T html
 
-    novel_to_any.pl -s Jjwxc -o "作品 何以笙箫默" -m 1 -t "novel_to_html.pl {url}"
+    NOVEL_TO_ANY.PL -S jJWXC -Q 作品 -V 何以笙箫默 -M 1 -T html
     
 
-=head1 FUNCTION
+=HEAD1 function
+
+    #初始化
 
     my $xs = Novel::Robot->new();
-    
 
-    #目录页
+    $xs->set_parser('Jjwxc');
+
+    $xs->set_packer('TXT');
+
+
+    #下载整本小说
 
     my $index_url = 'http://www.jjwxc.net/onebook.php?novelid=2456';
 
-    my $index_ref = $xs->get_index_ref($index_url);
+    $xs->get_book($index_url);
 
     #目录页
 
-    $xs->set_site('Jjwxc');
+    my $index_ref = $xs->get_index_ref($index_url);
 
     my $index_ref = $xs->get_index_ref(2456);
 
@@ -72,10 +78,6 @@ Dddbbb : 豆豆小说网 http://www.dddbbb.net
     my $chapter_url = 'http://www.jjwxc.net/onebook.php?novelid=2456&chapterid=2';
 
     my $chapter_ref = $xs->get_chapter_ref($chapter_url, 2);
-
-    #章节页
-
-    $xs->set_site('Jjwxc');
 
     my $chapter_ref = $xs->get_chapter_ref(2456,2);
 
@@ -89,7 +91,9 @@ Dddbbb : 豆豆小说网 http://www.dddbbb.net
 
     #查询
 
-    $xs->set_site('Jjwxc');
+    my $query_type = '作者';
+
+    my $query_value = '顾漫';
 
     my $query_ref = $xs->get_query_ref($query_type, $query_value);
 
