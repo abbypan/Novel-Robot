@@ -44,12 +44,12 @@ Dddbbb : 豆豆小说网 http://www.dddbbb.net
     
     #批量处理小说(支持to TXT/HTML/...)
 
-    NOVEL_TO_ANY.PL -W "HTTP://WWW.JJWXC.NET/ONEAUTHOR.PHP?AUTHORID=3243" -M 1 -T html
+    novel_to_any.pl -w "http://www.jjwxc.net/oneauthor.php?authorid=3243" -m 1 -t HTML
 
-    NOVEL_TO_ANY.PL -S jJWXC -Q 作品 -V 何以笙箫默 -M 1 -T html
+    novel_to_any.pl -s Jjwxc -q 作品 -v 何以笙箫默 -m 1 -t HTML
     
 
-=HEAD1 function
+=head1 FUNCTION
 
     #初始化
 
@@ -112,6 +112,8 @@ use Moo;
 use Novel::Robot::Browser;
 use Novel::Robot::Parser;
 use Novel::Robot::Packer;
+
+our $VERSION = 0.16
 
 has browser => (
     is      => 'rw',
