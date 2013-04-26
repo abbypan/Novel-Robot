@@ -113,7 +113,7 @@ use Novel::Robot::Browser;
 use Novel::Robot::Parser;
 use Novel::Robot::Packer;
 
-our $VERSION = 0.16
+our $VERSION = 0.18;
 
 has browser => (
     is      => 'rw',
@@ -177,7 +177,8 @@ sub get_book {
 
     $self->{packer}->format_before_chapter($index_ref);
     for my $i ( 1 .. $index_ref->{chapter_num} ) {
-        my $u = $index_ref->{chapter_urls}[$i];
+        #my $u = $index_ref->{chapter_urls}[$i];
+        my $u = $index_ref->{chapter_info}[$i]{url};
         next unless ($u);
 
         #print "\rget chapter $i/$index_ref->{chapter_num} : $u";
@@ -307,7 +308,30 @@ sub select_book {
 
 } ## end sub select_book
 
-### }}}
+sub deal_book {
+    my ( $self, $book_src, $o ) = @_;
+    $o ||= {};
+
+    my $index_ref = $self->{parser}->parse_index($book_src);
+    return unless ($index_ref);
+
+    $self->{packer}->open_packer($index_ref);
+
+    $self->{packer}->format_before_index($index_ref);
+    $self->{packer}->format_index($index_ref);
+    $self->{packer}->format_after_index($index_ref);
+
+    $self->{packer}->format_before_chapter($index_ref);
+    for my $i ( 1 .. $index_ref->{chapter_num} ) {
+        my $chap_ref = $index_ref->{chapter_info}[$i];
+        next unless ($chap_ref);
+
+        $self->{packer}->format_chapter( $chap_ref, $i );
+    } ## end for my $i ( 1 .. $index_ref...)
+    $self->{packer}->format_after_chapter($index_ref);
+
+    $self->{packer}->close_packer();
+} ## end sub get_book
 
 no Moo;
 1;
