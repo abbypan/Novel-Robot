@@ -47,6 +47,14 @@ Dddbbb : 豆豆小说网 http://www.dddbbb.net
     novel_to_any.pl -w "http://www.jjwxc.net/oneauthor.php?authorid=3243" -m 1 -t HTML
 
     novel_to_any.pl -s Jjwxc -q 作品 -v 何以笙箫默 -m 1 -t HTML
+
+    #解析TXT，转换为HTML
+
+    dzs_to_html.pl -w 顾漫 -b 何以笙箫默 -o hy1.txt
+
+    #解析TXT，导入wordpress空间
+
+    dzs_to_wordpress.pl -W 顾漫 -b 何以笙箫默 -o hy.txt -c 言情 -w http://xxx.xxx.com  -u xxx -p xxx
     
 
 =head1 FUNCTION
@@ -65,6 +73,7 @@ Dddbbb : 豆豆小说网 http://www.dddbbb.net
     my $index_url = 'http://www.jjwxc.net/onebook.php?novelid=2456';
 
     $xs->get_book($index_url);
+
 
     #目录页
 
@@ -113,7 +122,7 @@ use Novel::Robot::Browser;
 use Novel::Robot::Parser;
 use Novel::Robot::Packer;
 
-our $VERSION = 0.18;
+our $VERSION = 0.19;
 
 has browser => (
     is      => 'rw',
