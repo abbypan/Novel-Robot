@@ -4,23 +4,19 @@
 
 =encoding utf8
 
-=head1 NAME
-
-Novel::Robot
-
 =head1 DESCRIPTION 
 
 小说下载器
 
-=head2 支持站点
+=head2 支持小说输入形式
 
-=item * 
+见 Novel::Robot::Parser
 
-Jjwxc  : 绿晋江     http://www.jjwxc.net
+=back
 
-=item *
+=head2 支持小说输出形式
 
-Dddbbb : 豆豆小说网 http://www.dddbbb.net
+见 Novel::Robot::Packer
 
 =back
 
@@ -203,11 +199,10 @@ sub get_index_ref {
 
     my ( $self, @args ) = @_;
 
-    my ($index_url) = $self->{parser}->generate_index_url(@args);
+    my ($index_url) = $self->{parser}->make_index_url(@args);
 
     my $html_ref = $self->{browser}->get_url_ref($index_url);
 
-    $self->{parser}->alter_index_before_parse($html_ref);
     my $ref = $self->{parser}->parse_index($html_ref);
     return unless ( defined $ref );
 
@@ -228,11 +223,10 @@ sub get_index_ref {
 sub get_chapter_ref {
     my ( $self, @args ) = @_;
 
-    my ( $chap_url, $chap_id ) = $self->{parser}->generate_chapter_url(@args);
+    my ( $chap_url, $chap_id ) = $self->{parser}->make_chapter_url(@args);
     my $html_ref = $self->{browser}->get_url_ref($chap_url);
     return unless ($html_ref);
 
-    $self->{parser}->alter_chapter_before_parse($html_ref);
     my $ref = $self->{parser}->parse_chapter($html_ref);
     return unless ($ref);
 
@@ -240,8 +234,8 @@ sub get_chapter_ref {
     $ref->{content} =~ s#(\S+)$#<p>$1</p>#s;
     $ref->{content} =~ s###g;
 
-    $ref->{chapter_url} = $chap_url;
-    $ref->{chapter_id}  = $chap_id;
+    $ref->{url} = $chap_url;
+    $ref->{id}  = $chap_id;
 
     return $ref;
 } ## end sub get_chapter_ref
@@ -250,7 +244,9 @@ sub get_empty_chapter_ref {
     my ( $self, $id ) = @_;
 
     my %data;
-    $data{chapter_id} = $id;
+    $data{id} = $id;
+    $data{title} = '空';
+    $data{content} = '空';
 
     return \%data;
 } ## end sub get_empty_chapter_ref
@@ -258,7 +254,7 @@ sub get_empty_chapter_ref {
 sub get_writer_ref {
     my ( $self, @args ) = @_;
 
-    my ($writer_url) = $self->{parser}->generate_writer_url(@args);
+    my ($writer_url) = $self->{parser}->make_writer_url(@args);
 
     my $html_ref = $self->{browser}->get_url_ref($writer_url);
 
