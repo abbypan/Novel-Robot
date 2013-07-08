@@ -200,7 +200,6 @@ sub get_book {
 
             while (1) {
                 last unless ( exists $temp_chap{$i} );
-                print "\rall $chap_num, now $i";
                 my $chap_ref = $temp_chap{$i};
                 eval {
                 $pk->write_packer($w_sub, $pk->format_chapter( $chap_ref ))
@@ -213,7 +212,11 @@ sub get_book {
         }
     );
 
-    for my $r ( @{ $index_ref->{chapter_info} } ) {
+    my $chap_ids = $o->{chapter_ids} || [ 1 .. $index_ref->{chapter_num} ];
+
+    for my $i ( @$chap_ids ) {
+        #for my $r ( @{ $index_ref->{chapter_info} } ) {
+        my $r = $index_ref->{chapter_info}[$i-1];
         my $pid = $pm->start and next;
 
         my $chap_ref =
@@ -228,7 +231,6 @@ sub get_book {
 
     $pk->write_packer($w_sub, $pk->format_after_chapter( $index_ref ));
 
-    print "\r";
 
     return $w_dst;
 } ## end sub get_book

@@ -63,5 +63,5 @@ my %packer_opt = (
 $packer_opt{tag}      = [ split ',', decode( locale => $opt{t} ) ] if ( $opt{t} );
 $packer_opt{category} = [ split ',' , decode( locale => $opt{c} ) ] if ( $opt{c} );
 
-$xs->set_packer( 'WordPress', \%packer_opt );
-$xs->get_book($index_url);
+$xs->set_packer( 'WordPress' );
+$xs->get_book($index_url, \%packer_opt);
