@@ -11,6 +11,13 @@ $xs->set_packer('HTML');
 my $index_url = 'http://www.dddbbb.net/html/10678/index.html';
 my $chapter_url = "http://www.dddbbb.net/10678_569905.html";
 
+#$index_url = 'http://www.dddbbb.net/html2/90731/index.html';
+#my $index_ref = $xs->get_index_ref($index_url);
+#dump($index_ref);exit;
+#$chapter_url = 'http://www.dddbbb.net/90731_5169364.html';
+#my $chapter_ref = $xs->get_chapter_ref($chapter_url);
+#dump($chapter_ref);exit;
+
 my $index_ref = $xs->get_index_ref($index_url);
 is($index_ref->{book}=~/^拼图/ ? 1 : 0, 1,'book');
 is($index_ref->{writer}, '凌淑芬', 'writer');
