@@ -31,9 +31,10 @@
 
 -p : wordpress 密码
 
+-i : chapter ids，章节序号，例如 1,4-7,10
+
 =cut
 
-#-i : chapter ids，章节序号，例如 1,4-7,10
 
 use strict;
 use warnings;
@@ -48,7 +49,7 @@ use Novel::Robot;
 $| = 1;
 
 my %opt;
-getopt( 'bctwup', \%opt );
+getopt( 'bctwupi', \%opt );
 
 my $xs = Novel::Robot->new();
 
@@ -62,6 +63,7 @@ my %packer_opt = (
 );
 $packer_opt{tag}      = [ split ',', decode( locale => $opt{t} ) ] if ( $opt{t} );
 $packer_opt{category} = [ split ',' , decode( locale => $opt{c} ) ] if ( $opt{c} );
+$packer_opt{chapter_ids} = $xs->split_id_list($opt{i}) if ( $opt{i} );
 
 $xs->set_packer( 'WordPress' );
 $xs->get_book($index_url, \%packer_opt);

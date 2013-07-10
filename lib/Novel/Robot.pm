@@ -121,7 +121,7 @@ use Novel::Robot::Browser;
 use Novel::Robot::Parser;
 use Novel::Robot::Packer;
 
-our $VERSION = 0.22;
+our $VERSION = 0.23;
 
 has browser => (
     is      => 'rw',
@@ -170,26 +170,24 @@ sub set_packer {
 
 } ## end sub set_packer
 
+
 sub get_book {
-    my ( $self, $index_url , $o) = @_;
+    my ( $self, $index_url, $o ) = @_;
     $o ||= {};
 
     my $index_ref = $self->get_index_ref($index_url);
     return unless ($index_ref);
 
     my $pk = $self->{packer};
+    my ( $w_sub, $w_dst ) = $pk->open_packer( $index_ref, $o );
 
-    my ($w_sub, $w_dst) = $pk->open_packer($index_ref, $o);
+    $pk->write_packer( $w_sub, $pk->format_before_index($index_ref) );
+    $pk->write_packer( $w_sub, $pk->format_index($index_ref) );
+    $pk->write_packer( $w_sub, $pk->format_before_chapter($index_ref) );
 
-    $pk->write_packer($w_sub, $pk->format_before_index( $index_ref ));
-    $pk->write_packer($w_sub, $pk->format_index( $index_ref ));
-
-    $pk->write_packer($w_sub, $pk->format_before_chapter( $index_ref ));
-
-    my $i = 1;
+    my $chap_ids = $o->{chapter_ids} || [ 1 .. $index_ref->{chapter_num} ];
+    my @work_chap_ids = @$chap_ids;
     my %temp_chap;
-
-    my $chap_num = scalar(@{ $index_ref->{chapter_info} });
 
     my $pm = Parallel::ForkManager->new( $self->{max_process_num} );
     $pm->run_on_finish(
@@ -199,38 +197,34 @@ sub get_book {
             $temp_chap{ $r->{id} } = $r;
 
             while (1) {
-                last unless ( exists $temp_chap{$i} );
-                my $chap_ref = $temp_chap{$i};
-                eval {
-                $pk->write_packer($w_sub, $pk->format_chapter( $chap_ref ))
-                if ( $chap_ref->{content} );
-                };
-                $temp_chap{$i} = undef;
-                $i++;
-            }
+                my ( $chap_r, $clean_chap_sub ) =
+                  $self->get_work_chapter( \@work_chap_ids, \%temp_chap );
 
+                last unless ($chap_r);
+
+                $pk->write_packer( $w_sub, $pk->format_chapter($chap_r) )
+                  if ( $chap_r->{content} );
+
+                $clean_chap_sub->();
+            }
         }
     );
 
-    my $chap_ids = $o->{chapter_ids} || [ 1 .. $index_ref->{chapter_num} ];
-
-    for my $i ( @$chap_ids ) {
-        #for my $r ( @{ $index_ref->{chapter_info} } ) {
-        my $r = $index_ref->{chapter_info}[$i-1];
+    for my $i (@$chap_ids) {
+        my $r = $index_ref->{chapter_info}[ $i - 1 ];
         my $pid = $pm->start and next;
 
         my $chap_ref =
-        ( exists $r->{content} )
-        ? $r
-        : $self->get_chapter_ref( $r->{url}, $r->{id} );
+          ( exists $r->{content} )
+          ? $r
+          : $self->get_chapter_ref( $r->{url}, $r->{id} );
 
         $pm->finish( 0, $chap_ref );
     } ## end for my $i ( 1 .. $index_ref...)
 
     $pm->wait_all_children;
 
-    $pk->write_packer($w_sub, $pk->format_after_chapter( $index_ref ));
-
+    $pk->write_packer( $w_sub, $pk->format_after_chapter($index_ref) );
 
     return $w_dst;
 } ## end sub get_book
@@ -251,9 +245,9 @@ sub get_book_with_single_proc {
     for my $r ( @{ $index_ref->{chapter_info} } ) {
         $i++;
         my $chap_ref =
-        ( exists $r->{content} )
-        ? $r
-        : $self->get_chapter_ref( $r->{url}, $r->{id} || $i );
+          ( exists $r->{content} )
+          ? $r
+          : $self->get_chapter_ref( $r->{url}, $r->{id} || $i );
 
         next unless ( $chap_ref->{content} );
 
@@ -269,7 +263,7 @@ sub get_index_ref {
     my ( $self, $index_url ) = @_;
 
     return $self->{parser}->parse_index($index_url)
-    unless ( $index_url =~ /^http/ );
+      unless ( $index_url =~ /^http/ );
 
     my $html_ref = $self->{browser}->request_url($index_url);
 
@@ -281,7 +275,7 @@ sub get_index_ref {
 
     if ( exists $ref->{more_book_info} ) {
         $self->{parser}
-        ->format_abs_url( $ref->{more_book_info}, $ref->{index_url} );
+          ->format_abs_url( $ref->{more_book_info}, $ref->{index_url} );
         for my $r ( @{ $ref->{more_book_info} } ) {
             my $info = $self->{browser}->request_url( $r->{url} );
             next unless ( defined $info );
@@ -294,6 +288,23 @@ sub get_index_ref {
 
     return $ref;
 } ## end sub get_index_ref
+
+sub get_work_chapter {
+    my ( $self, $work_chap_ids, $chap_info ) = @_;
+    return unless (@$work_chap_ids);
+
+    my $i = $work_chap_ids->[0];
+    return unless ( exists $chap_info->{$i} );
+
+    my $chap_r = $chap_info->{$i};
+
+    my $clean_sub = sub {
+        shift @$work_chap_ids;
+        $chap_r = undef;
+    };
+
+    return ( $chap_r, $clean_sub );
+}
 
 sub get_chapter_ref {
     my ( $self, $chap_url, $chap_id ) = @_;
@@ -333,10 +344,10 @@ sub get_query_ref {
     my ( $self, $type, $keyword ) = @_;
 
     my ( $url, $post_vars ) =
-    $self->{parser}->make_query_request( $type, $keyword );
+      $self->{parser}->make_query_request( $type, $keyword );
     $url = encode( $self->{parser}->charset, $url );
     $post_vars->{$_} = encode( $self->{parser}->charset, $post_vars->{$_} )
-    for keys(%$post_vars);
+      for keys(%$post_vars);
 
     my $html_ref = $self->{browser}->request_url( $url, $post_vars );
     return unless $html_ref;
@@ -375,15 +386,34 @@ sub select_book {
     #最后选出来的小说
     my @select_result;
     for my $item ( &Menu( \%menu ) ) {
-    $item = decode( locale => $item );
-    my ( $info, $book ) = ( $item =~ /^(.*) --- (.*)$/ );
-    push @select_result,
-    { info => $info, book => $book, url => $select{$item} };
-}
+        $item = decode( locale => $item );
+        my ( $info, $book ) = ( $item =~ /^(.*) --- (.*)$/ );
+        push @select_result,
+          { info => $info, book => $book, url => $select{$item} };
+    }
 
-return \@select_result;
+    return \@select_result;
 
 } ## end sub select_book
+
+sub split_id_list {
+
+    #1,3,9-11
+    my ( $self, $id_list ) = @_;
+
+    my @id_list = split ',', $id_list;
+
+    my @chap_ids;
+    for my $i (@id_list) {
+        my ( $s, $e ) = split '-', $i;
+        $e ||= $s;
+        push @chap_ids, ( $s .. $e );
+    }
+
+    @chap_ids = [ sort @chap_ids ];
+
+    return \@chap_ids;
+}
 
 no Moo;
 1;
