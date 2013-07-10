@@ -72,8 +72,15 @@
 
 =head2 select_book 在Term下选择小说
 
+    $xs->set_parser('Jjwxc');
+
+    my $writer_url = 'http://www.jjwxc.net/oneauthor.php?authorid=3243';
+    my $writer_ref = $xs->{parser}->get_writer_ref($writer_url);
     my $select_ref = $xs->select_book($writer_ref);
 
+    my $keyword = '作者';
+    my $value='顾漫';
+    $books_ref = $xs->{parser}->get_query_ref($keyword, $value);
     my $select_ref = $xs->select_book($query_ref);
 
 =cut
