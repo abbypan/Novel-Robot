@@ -65,38 +65,10 @@
     $xs->get_book($index_url);
 
 
-
     $xs->set_parser('TXT');
 
     $xs->get_book({ writer => '顾漫', book => '何以笙箫默', 
             path => [ '/somepath/somefile.txt' ] });
-
-
-=head2 get_index_ref 获取目录页信息
-
-    $xs->set_parser('Jjwxc');
-
-    my $index_ref = $xs->get_index_ref($index_url);
-
-=head2 get_chapter_ref 获取章节页信息
-
-    my $chapter_url = 'http://www.jjwxc.net/onebook.php?novelid=2456&chapterid=2';
-
-    my $chapter_ref = $xs->get_chapter_ref($chapter_url, 2);
-
-=head2 get_writer_ref 获取作者页信息
-
-    my $writer_url = 'http://www.jjwxc.net/oneauthor.php?authorid=3243';
-
-    my $writer_ref = $xs->get_writer_ref($writer_url);
-
-=head2 get_query_ref 获取查询结果
-
-    my $query_type = '作者';
-
-    my $query_value = '顾漫';
-
-    my $query_ref = $xs->get_query_ref($query_type, $query_value);
 
 =head2 select_book 在Term下选择小说
 
@@ -117,65 +89,37 @@ use Term::Menus;
 use Moo;
 use Parallel::ForkManager;
 
-use Novel::Robot::Browser;
 use Novel::Robot::Parser;
 use Novel::Robot::Packer;
 
 our $VERSION = 0.23;
 
-has browser => (
-    is      => 'rw',
-    default => sub {
-        my ($self) = @_;
-        my $browser = new Novel::Robot::Browser();
-        return $browser;
-    },
-);
-
-has parser_base => (
-    is      => 'ro',
-    default => sub {
-        my ($self) = @_;
-        my $parser_base = new Novel::Robot::Parser();
-        return $parser_base;
-    },
-);
-
 has parser => ( is => 'rw', );
-
-has packer_base => (
-    is      => 'ro',
-    default => sub {
-        my ($self) = @_;
-        my $packer_base = new Novel::Robot::Packer();
-        return $packer_base;
-    },
-);
-
 has packer => ( is => 'rw', );
-
 has max_process_num => ( is => 'rw', default => sub { 3 } );
 
 sub set_parser {
     my ( $self, @parser_args ) = @_;
 
-    $self->{parser} = $self->{parser_base}->init_parser(@parser_args);
+    my $parser_base = new Novel::Robot::Parser();
+    $self->{parser} = $parser_base->init_parser(@parser_args);
 
 } ## end sub set_parser
 
 sub set_packer {
     my ( $self, @packer_args ) = @_;
 
-    $self->{packer} = $self->{packer_base}->init_packer(@packer_args);
+    my $packer_base = new Novel::Robot::Packer();
+    $self->{packer} = $packer_base->init_packer(@packer_args);
 
 } ## end sub set_packer
-
 
 sub get_book {
     my ( $self, $index_url, $o ) = @_;
     $o ||= {};
 
-    my $index_ref = $self->get_index_ref($index_url);
+    my $parser = $self->{parser};
+    my $index_ref = $parser->get_index_ref($index_url);
     return unless ($index_ref);
 
     my $pk = $self->{packer};
@@ -185,41 +129,40 @@ sub get_book {
     $pk->write_packer( $w_sub, $pk->format_index($index_ref) );
     $pk->write_packer( $w_sub, $pk->format_before_chapter($index_ref) );
 
-    my $chap_ids = $o->{chapter_ids} || [ 1 .. $index_ref->{chapter_num} ];
-    my @work_chap_ids = @$chap_ids;
-    my %temp_chap;
+    my $chap_ids = $self->{parser}->get_chapter_ids($index_ref, $o);
 
-    my $pm = Parallel::ForkManager->new( $self->{max_process_num} );
-    $pm->run_on_finish(
-        sub {
-            my ( $pid, $exit_code, $ident, $exit, $core, $r ) = @_;
+    my ($add_chap_sub, $work_chap_sub, $del_chap_sub)  = $self->get_chapter_iter($chap_ids);
+    my $process_chap_sub = sub {
+            my ($chap) = @_;
+            $add_chap_sub->($chap);
 
-            $temp_chap{ $r->{id} } = $r;
-
-            while (1) {
-                my ( $chap_r, $clean_chap_sub ) =
-                  $self->get_work_chapter( \@work_chap_ids, \%temp_chap );
-
-                last unless ($chap_r);
+            while ( my $chap_r = $work_chap_sub->() ) {
 
                 $pk->write_packer( $w_sub, $pk->format_chapter($chap_r) )
-                  if ( $chap_r->{content} );
+                unless($parser->is_empty_chapter($chap_r));
+                
+                $del_chap_sub->();
+            } 
+        };
 
-                $clean_chap_sub->();
-            }
-        }
-    );
+    my $pm = Parallel::ForkManager->new( $self->{max_process_num} );
+    $pm->run_on_finish( sub {
+            my ( $pid, $exit_code, $ident, $exit, $core, $chap ) = @_;
+            $process_chap_sub->($chap);
+        });
 
     for my $i (@$chap_ids) {
-        my $r = $index_ref->{chapter_info}[ $i - 1 ];
-        my $pid = $pm->start and next;
+        my $chap_r = $parser->get_nth_chapter_info($index_ref, $i);
+        my $is_empty_chapter = $parser->is_empty_chapter($chap_r);
 
-        my $chap_ref =
-          ( exists $r->{content} )
-          ? $r
-          : $self->get_chapter_ref( $r->{url}, $r->{id} );
+        if($is_empty_chapter){
+            my $pid = $pm->start and next;
+            my $r = $parser->get_chapter_ref( $chap_r->{url}, $chap_r->{id} );
+            $pm->finish( 0, $r );
+        }else{
+            $process_chap_sub->($chap_r);
+        }
 
-        $pm->finish( 0, $chap_ref );
     } ## end for my $i ( 1 .. $index_ref...)
 
     $pm->wait_all_children;
@@ -229,142 +172,36 @@ sub get_book {
     return $w_dst;
 } ## end sub get_book
 
-sub get_book_with_single_proc {
-    my ( $self, $index_url ) = @_;
+sub get_chapter_iter {
+    my ( $self, $chap_ids) = @_;
+    return unless ($chap_ids);
 
-    my $index_ref = $self->get_index_ref($index_url);
-    return unless ($index_ref);
+    my %chap_window;
+    my $work_index = 0;
+    my $work_num = scalar(@$chap_ids);
 
-    my $fh = $self->{packer}->open_packer($index_ref);
-
-    $self->{packer}->format_before_index( $fh, $index_ref );
-    $self->{packer}->format_index( $fh, $index_ref );
-
-    $self->{packer}->format_before_chapter( $fh, $index_ref );
-    my $i = 0;
-    for my $r ( @{ $index_ref->{chapter_info} } ) {
-        $i++;
-        my $chap_ref =
-          ( exists $r->{content} )
-          ? $r
-          : $self->get_chapter_ref( $r->{url}, $r->{id} || $i );
-
-        next unless ( $chap_ref->{content} );
-
-        $self->{packer}->format_chapter( $fh, $chap_ref, $i );
-    } ## end for my $i ( 1 .. $index_ref...)
-    $self->{packer}->format_after_chapter( $fh, $index_ref );
-
-    $self->{packer}->close_packer( $fh, $index_ref );
-} ## end sub get_book
-
-sub get_index_ref {
-
-    my ( $self, $index_url ) = @_;
-
-    return $self->{parser}->parse_index($index_url)
-      unless ( $index_url =~ /^http/ );
-
-    my $html_ref = $self->{browser}->request_url($index_url);
-
-    my $ref = $self->{parser}->parse_index($html_ref);
-    return unless ( defined $ref );
-
-    $ref->{index_url} = $index_url;
-    $ref->{site}      = $self->{parser}{site};
-
-    if ( exists $ref->{more_book_info} ) {
-        $self->{parser}
-          ->format_abs_url( $ref->{more_book_info}, $ref->{index_url} );
-        for my $r ( @{ $ref->{more_book_info} } ) {
-            my $info = $self->{browser}->request_url( $r->{url} );
-            next unless ( defined $info );
-            $r->{function}->( $ref, $info );
-        }
-    }
-
-    $self->{parser}->calc_index_chapter_num($ref);
-    $self->{parser}->format_abs_url( $ref->{chapter_info}, $ref->{index_url} );
-
-    return $ref;
-} ## end sub get_index_ref
-
-sub get_work_chapter {
-    my ( $self, $work_chap_ids, $chap_info ) = @_;
-    return unless (@$work_chap_ids);
-
-    my $i = $work_chap_ids->[0];
-    return unless ( exists $chap_info->{$i} );
-
-    my $chap_r = $chap_info->{$i};
-
-    my $clean_sub = sub {
-        shift @$work_chap_ids;
-        $chap_r = undef;
+    my $add_chap_sub = sub {
+        my ($chap) = @_;
+        $chap_window{ $chap->{id} } = $chap;
     };
 
-    return ( $chap_r, $clean_sub );
+    my $work_chap_sub = sub {
+        return unless($work_index<$work_num);
+
+        my $i = $chap_ids->[$work_index];
+        return unless ( exists $chap_window{$i} );
+
+        return $chap_window{$i};
+    };
+
+    my $del_chap_sub = sub {
+        my $i = $chap_ids->[$work_index];
+        $chap_window{$i} = undef;
+        $work_index++;
+    };
+
+    return ( $add_chap_sub, $work_chap_sub, $del_chap_sub);
 }
-
-sub get_chapter_ref {
-    my ( $self, $chap_url, $chap_id ) = @_;
-
-    my $html_ref = $self->{browser}->request_url($chap_url);
-    my $ref      = $self->{parser}->parse_chapter($html_ref);
-
-    my $null_chapter_ref = {
-        content => '',
-        title   => '[空]',
-        id      => $chap_id || 1,
-    };
-    return $null_chapter_ref unless ($ref);
-
-    $ref->{content} =~ s#\s*([^><]+)(<br />\s*){1,}#<p>$1</p>\n#g;
-    $ref->{content} =~ s#(\S+)$#<p>$1</p>#s;
-    $ref->{content} =~ s###g;
-
-    $ref->{url} = $chap_url;
-    $ref->{id}  = $chap_id;
-
-    return $ref;
-} ## end sub get_chapter_ref
-
-sub get_writer_ref {
-    my ( $self, $writer_url ) = @_;
-
-    my $html_ref = $self->{browser}->request_url($writer_url);
-
-    my $writer_books = $self->{parser}->parse_writer($html_ref);
-    $self->{parser}->format_abs_url( $writer_books->{booklist}, $writer_url );
-
-    return $writer_books;
-} ## end sub get_writer_ref
-
-sub get_query_ref {
-    my ( $self, $type, $keyword ) = @_;
-
-    my ( $url, $post_vars ) =
-      $self->{parser}->make_query_request( $type, $keyword );
-    $url = encode( $self->{parser}->charset, $url );
-    $post_vars->{$_} = encode( $self->{parser}->charset, $post_vars->{$_} )
-      for keys(%$post_vars);
-
-    my $html_ref = $self->{browser}->request_url( $url, $post_vars );
-    return unless $html_ref;
-
-    my $result = $self->{parser}->parse_query($html_ref);
-
-    my $result_urls_ref = $self->{parser}->parse_query_result_urls($html_ref);
-    for my $url (@$result_urls_ref) {
-        my $h = $self->{browser}->request_url($url);
-        my $r = $self->{parser}->parse_query($h);
-        push @$result, @$r;
-    }
-
-    $self->{parser}->format_abs_url( $result, $url );
-
-    return $result;
-} ## end sub get_query_ref
 
 sub select_book {
     my ( $self, $info_ref ) = @_;
@@ -409,8 +246,6 @@ sub split_id_list {
         $e ||= $s;
         push @chap_ids, ( $s .. $e );
     }
-
-    @chap_ids = [ sort @chap_ids ];
 
     return \@chap_ids;
 }

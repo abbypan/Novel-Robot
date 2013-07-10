@@ -55,13 +55,13 @@ $xs->set_parser($opt{w} || $opt{s});
 my $books_ref;
 if($opt{w}){
     #writer
-    my $writer_ref = $xs->get_writer_ref($opt{w});
+    my $writer_ref = $xs->{parser}->get_writer_ref($opt{w});
     $books_ref = $writer_ref->{booklist};
 }elsif($opt{q}){
     #query
     my $keyword = decode( locale => $opt{q});
     my $value = decode( locale => $opt{v});
-    $books_ref = $xs->get_query_ref($keyword, $value);
+    $books_ref = $xs->{parser}->get_query_ref($keyword, $value);
 }
 
 my $select = $opt{m} ? $xs->select_book($books_ref) : $books_ref;
