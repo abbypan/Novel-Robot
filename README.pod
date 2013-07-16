@@ -4,17 +4,27 @@
 
 =head1 名称
 
-Novel::Robot 小说下载器
+L<Novel::Robot> 小说下载器
 
 =head1 说明
 
 =head2 支持小说站点
 
-见 L<Novel::Robot::Parser>
+L<Jjwxc|http://www.jjwxc.net>
+
+L<Dddbbb|http://www.dddbbb.net>
+
+L<Nunu|http://book.kanunu.org>
+
+L<Shunong|http://book.shunong.com>
 
 =head2 支持小说输出形式
 
-见 L<Novel::Robot::Packer>
+TXT
+
+HTML
+
+WordPress
 
 =head1 例子
 
