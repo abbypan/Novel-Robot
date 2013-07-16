@@ -87,9 +87,13 @@ Novel::Robot 小说下载器
 
 =head1 SCRIPT
 
-=head2 novel_to_any.pl
+=head2 小说批量处理
 
-    L<doc/novel_to_any.pod>
+=begin html
+
+<a href="doc/novel_to_any.pod">novel_to_any.pl</a>
+
+=end html
 
 =cut
 
