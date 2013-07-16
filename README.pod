@@ -87,25 +87,52 @@ Novel::Robot 小说下载器
 
 =head1 工具
 
-=head2 novel_to_txt.pl
+=head2 小说导出为TXT
 
 =begin html
 
-<li>小说导出为TXT <a href="doc/novel_to_txt.pod">novel_to_txt.pl</a>
+<a href="doc/novel_to_txt.pod">novel_to_txt.pl</a>
 
 =end html
+
+=head2 小说导出为HTML
 
 =begin html
 
-<ul>
-<li>小说批量处理 <a href="doc/novel_to_any.pod">novel_to_any.pl</a>
-<li>小说导出为HTML <a href="doc/novel_to_html.pod">novel_to_html.pl</a>
-<li>小说导出到wordpress <a href="doc/novel_to_wordpress.pod">novel_to_wordpress.pl</a>
-<li>TXT电子书转换为HTML <a href="doc/dzs_to_html.pod">dzs_to_html.pl</a>
-<li>TXT电子书转换为wordpress <a href="doc/dzs_to_wordpress.pod">dzs_to_wordpress.pl</a>
-</ul>
+<a href="doc/novel_to_html.pod">novel_to_html.pl</a>
 
 =end html
 
+=head2 小说导出到wordpress
+
+=begin html
+
+<a href="doc/novel_to_wordpress.pod">novel_to_wordpress.pl</a>
+
+=end html
+
+=head2 小说批量处理
+
+=begin html
+
+<a href="doc/novel_to_any.pod">novel_to_any.pl</a>
+
+=end html
+
+=head2 TXT电子书转换为HTML
+
+=begin html
+
+<a href="doc/dzs_to_html.pod">dzs_to_html.pl</a>
+
+=end html
+
+=head2 TXT电子书导出到wordpress
+
+=begin html
+
+<a href="doc/dzs_to_wordpress.pod">dzs_to_wordpress.pl</a>
+
+=end html
 =cut
 
