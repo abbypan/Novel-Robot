@@ -1,41 +1,4 @@
 #!/usr/bin/perl 
-
-=pod
-
-=encoding utf8
-
-=head1  DESC
-
-    下载小说，导入wordpress空间
-
-=head1 EXAMPLE
-
-    novel_to_wordpress.pl -b "http://www.dddbbb.net/html/18451/index.html" -c 言情 -w http://xxx.xxx.com  -u xxx -p xxx
-    novel_to_wordpress.pl -b "http://www.jjwxc.net/onebook.php?novelid=2456" -c 原创 -w http://xxx.xxx.com  -u xxx -p xxx
-
-=head1 USAGE
-
-    novel_to_wordpress.pl -b [index_url] -c [categories] -t [tags] -w [wordpress_url] -u [username] -p [password] 
-
-=head1 OPTIONS
-
--b : book url，小说目录页，例如 http://www.jjwxc.net/onebook.php?novelid=2456
-
--c : categories，小说类别，例如 原创
-
--t : tags，标签，例如 顾漫
-
--w : wordpress 地址
-
--u : wordpress 用户
-
--p : wordpress 密码
-
--i : chapter ids，章节序号，例如 1,4-7,10
-
-=cut
-
-
 use strict;
 use warnings;
 use utf8;

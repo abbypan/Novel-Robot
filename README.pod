@@ -85,5 +85,11 @@ Novel::Robot 小说下载器
     $books_ref = $xs->{parser}->get_query_ref($keyword, $value);
     my $select_ref = $xs->select_book($query_ref);
 
+=head1 SCRIPT
+
+=head2 novel_to_any.pl
+
+    L<novel_to_any|doc/novel_to_any.pod>
+
 =cut
 
