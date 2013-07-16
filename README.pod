@@ -2,21 +2,21 @@
 
 =encoding utf8
 
-=head1 NAME
+=head1 名称
 
 Novel::Robot 小说下载器
 
-=head1 DESCRIPTION 
+=head1 说明
 
-=head2 支持小说输入形式
+=head2 支持小说站点
 
-见 Novel::Robot::Parser
+见 L<Novel::Robot::Parser>
 
 =head2 支持小说输出形式
 
-见 Novel::Robot::Packer
+见 L<Novel::Robot::Packer>
 
-=head1 SYNOPSIS
+=head1 例子
 
 =head2 下载小说，存成txt/html
 
@@ -44,7 +44,7 @@ Novel::Robot 小说下载器
 
     dzs_to_wordpress.pl -W 顾漫 -b 何以笙箫默 -o hy.txt -c 言情 -w http://xxx.xxx.com  -u xxx -p xxx
 
-=head1 FUNCTION
+=head1 函数
 
 =head2 new 初始化
 
@@ -85,14 +85,17 @@ Novel::Robot 小说下载器
     $books_ref = $xs->{parser}->get_query_ref($keyword, $value);
     my $select_ref = $xs->select_book($query_ref);
 
-=head1 SCRIPT
-
-=head2 小说批量处理
+=head1 工具
 
 =begin html
-
-<a href="doc/novel_to_any.pod">novel_to_any.pl</a>
-
+<ul>
+<li>小说批量处理 <a href="doc/novel_to_any.pod">novel_to_any.pl</a>
+<li>小说导出为TXT <a href="doc/novel_to_txt.pod">novel_to_txt.pl</a>
+<li>小说导出为HTML <a href="doc/novel_to_html.pod">novel_to_html.pl</a>
+<li>小说导出到wordpress <a href="doc/novel_to_wordpress.pod">novel_to_wordpress.pl</a>
+<li>TXT电子书转换为HTML <a href="doc/dzs_to_html.pod">dzs_to_html.pl</a>
+<li>TXT电子书转换为wordpress <a href="doc/dzs_to_wordpress.pod">dzs_to_wordpress.pl</a>
+</ul>
 =end html
 
 =cut
