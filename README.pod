@@ -87,15 +87,24 @@ Novel::Robot 小说下载器
 
 =head1 工具
 
+=head2 novel_to_txt.pl
+
 =begin html
+
+<li>小说导出为TXT <a href="doc/novel_to_txt.pod">novel_to_txt.pl</a>
+
+=end html
+
+=begin html
+
 <ul>
 <li>小说批量处理 <a href="doc/novel_to_any.pod">novel_to_any.pl</a>
-<li>小说导出为TXT <a href="doc/novel_to_txt.pod">novel_to_txt.pl</a>
 <li>小说导出为HTML <a href="doc/novel_to_html.pod">novel_to_html.pl</a>
 <li>小说导出到wordpress <a href="doc/novel_to_wordpress.pod">novel_to_wordpress.pl</a>
 <li>TXT电子书转换为HTML <a href="doc/dzs_to_html.pod">dzs_to_html.pl</a>
 <li>TXT电子书转换为wordpress <a href="doc/dzs_to_wordpress.pod">dzs_to_wordpress.pl</a>
 </ul>
+
 =end html
 
 =cut
