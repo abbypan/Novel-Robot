@@ -89,7 +89,7 @@ Novel::Robot 小说下载器
 
 =head2 novel_to_any.pl
 
-    L<|novel_to_any|doc/novel_to_any.pod>
+    L<doc/novel_to_any.pod>
 
 =cut
 
