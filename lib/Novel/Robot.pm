@@ -13,10 +13,10 @@ use Parallel::ForkManager;
 use Novel::Robot::Parser;
 use Novel::Robot::Packer;
 
-our $VERSION = 0.23;
+our $VERSION = 0.27;
 
-has parser => ( is => 'rw', );
-has packer => ( is => 'rw', );
+has parser          => ( is => 'rw', );
+has packer          => ( is => 'rw', );
 has max_process_num => ( is => 'rw', default => sub { 3 } );
 
 sub set_parser {
@@ -39,50 +39,51 @@ sub get_book {
     my ( $self, $index_url, $o ) = @_;
     $o ||= {};
 
-    my $parser = $self->{parser};
+    my $parser    = $self->{parser};
     my $index_ref = $parser->get_index_ref($index_url);
     return unless ($index_ref);
 
     my $pk = $self->{packer};
-    my ( $w_sub, $w_dst ) = $pk->open_packer( $index_ref, $o );
+    my ( $w_sub, $end_sub ) = $pk->open_packer( $index_ref, $o );
 
     $pk->write_packer( $w_sub, $pk->format_before_index($index_ref) );
     $pk->write_packer( $w_sub, $pk->format_index($index_ref) );
     $pk->write_packer( $w_sub, $pk->format_before_chapter($index_ref) );
 
-    my $chap_ids = $self->{parser}->get_chapter_ids($index_ref, $o);
+    my $chap_ids = $self->{parser}->get_chapter_ids( $index_ref, $o );
 
-    my ($add_chap_sub, $work_chap_sub, $del_chap_sub)  = $self->get_chapter_iter($chap_ids);
-    my $process_chap_sub = sub {
-            my ($chap) = @_;
+    my ( $add_chap_sub, $work_chap_sub, $del_chap_sub ) =
+      $self->get_chapter_iter($chap_ids);
+
+    my $pm = Parallel::ForkManager->new( $self->{max_process_num} );
+    $pm->run_on_finish(
+        sub {
+            my ( $pid, $exit_code, $ident, $exit, $core, $chap ) = @_;
+            return unless($chap);
+
             $add_chap_sub->($chap);
 
             while ( my $chap_r = $work_chap_sub->() ) {
 
                 $pk->write_packer( $w_sub, $pk->format_chapter($chap_r) )
-                unless($parser->is_empty_chapter($chap_r));
-                
-                $del_chap_sub->();
-            } 
-        };
+                unless ( $parser->is_empty_chapter($chap_r) );
 
-    my $pm = Parallel::ForkManager->new( $self->{max_process_num} );
-    $pm->run_on_finish( sub {
-            my ( $pid, $exit_code, $ident, $exit, $core, $chap ) = @_;
-            $process_chap_sub->($chap);
-        });
+                $del_chap_sub->();
+            }
+        }
+    );
 
     for my $i (@$chap_ids) {
-        my $chap_r = $parser->get_nth_chapter_info($index_ref, $i);
+        my $chap_r = $parser->get_nth_chapter_info( $index_ref, $i );
         my $is_empty_chapter = $parser->is_empty_chapter($chap_r);
 
-        if($is_empty_chapter){
-            my $pid = $pm->start and next;
-            my $r = $parser->get_chapter_ref( $chap_r->{url}, $chap_r->{id} );
-            $pm->finish( 0, $r );
-        }else{
-            $process_chap_sub->($chap_r);
-        }
+        my $pid = $pm->start and next;
+
+        my $r = $is_empty_chapter ? 
+            $parser->get_chapter_ref( $chap_r->{url}, $chap_r->{id} )
+            : $chap_r ;
+
+        $pm->finish( 0, $r );
 
     } ## end for my $i ( 1 .. $index_ref...)
 
@@ -90,16 +91,18 @@ sub get_book {
 
     $pk->write_packer( $w_sub, $pk->format_after_chapter($index_ref) );
 
-    return $w_dst;
+    return $end_sub->() if($end_sub and ref($end_sub) eq 'CODE');
+
+    return $end_sub;
 } ## end sub get_book
 
 sub get_chapter_iter {
-    my ( $self, $chap_ids) = @_;
+    my ( $self, $chap_ids ) = @_;
     return unless ($chap_ids);
 
     my %chap_window;
     my $work_index = 0;
-    my $work_num = scalar(@$chap_ids);
+    my $work_num   = scalar(@$chap_ids);
 
     my $add_chap_sub = sub {
         my ($chap) = @_;
@@ -107,7 +110,7 @@ sub get_chapter_iter {
     };
 
     my $work_chap_sub = sub {
-        return unless($work_index<$work_num);
+        return unless ( $work_index < $work_num );
 
         my $i = $chap_ids->[$work_index];
         return unless ( exists $chap_window{$i} );
@@ -121,7 +124,7 @@ sub get_chapter_iter {
         $work_index++;
     };
 
-    return ( $add_chap_sub, $work_chap_sub, $del_chap_sub);
+    return ( $add_chap_sub, $work_chap_sub, $del_chap_sub );
 }
 
 sub select_book {
