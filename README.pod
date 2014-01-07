@@ -24,17 +24,29 @@ TXT
 
 HTML
 
+Markdown
+
 WordPress
 
 =head1 例子
 
 =head2 下载小说，存成txt/html
 
-    novel_to_txt.pl "http://www.dddbbb.net/html/18451/index.html"
+    get_novel.pl [index_url] [type]
 
-=head2 下载小说，存成html
+    get_novel.pl "http://www.dddbbb.net/html/18451/index.html" TXT
 
-    novel_to_html.pl "http://www.jjwxc.net/onebook.php?novelid=2456"
+    get_novel.pl "http://www.jjwxc.net/onebook.php?novelid=2456" HTML
+
+    get_novel.pl "http://www.jjwxc.net/onebook.php?novelid=2456" Markdown
+
+=head2 转换小说格式，需要预先安装calibre的ebook-convert
+    
+    convert_novel.pl [src_file] [type]
+
+    convert_novel.pl 施定柔-迷侠记.html mobi
+
+    convert_novel.pl 施定柔-迷侠记.html epub
 
 =head2 下载小说，导入wordpress空间
 
@@ -97,22 +109,6 @@ WordPress
 
 =head1 工具
 
-=head2 小说导出为TXT
-
-=begin html
-
-<a href="doc/novel_to_txt.pod">novel_to_txt.pl</a>
-
-=end html
-
-=head2 小说导出为HTML
-
-=begin html
-
-<a href="doc/novel_to_html.pod">novel_to_html.pl</a>
-
-=end html
-
 =head2 小说导出到wordpress
 
 =begin html
@@ -145,4 +141,3 @@ WordPress
 
 =end html
 =cut
-
