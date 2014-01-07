@@ -1,0 +1,148 @@
+=pod
+
+=encoding utf8
+
+=head1 名称
+
+L<Novel::Robot> 小说下载器
+
+=head1 说明
+
+=head2 支持小说站点
+
+L<Jjwxc|http://www.jjwxc.net>
+
+L<Dddbbb|http://www.dddbbb.net>
+
+L<Nunu|http://book.kanunu.org>
+
+L<Shunong|http://book.shunong.com>
+
+=head2 支持小说输出形式
+
+TXT
+
+HTML
+
+WordPress
+
+=head1 例子
+
+=head2 下载小说，存成txt/html
+
+    novel_to_txt.pl "http://www.dddbbb.net/html/18451/index.html"
+
+=head2 下载小说，存成html
+
+    novel_to_html.pl "http://www.jjwxc.net/onebook.php?novelid=2456"
+
+=head2 下载小说，导入wordpress空间
+
+    novel_to_wordpress.pl -b "http://www.jjwxc.net/onebook.php?novelid=2456" -c 原创 -w http://xxx.xxx.com  -u xxx -p xxx
+
+=head2 批量处理小说(支持to TXT/HTML/...)
+
+    novel_to_any.pl -w "http://www.jjwxc.net/oneauthor.php?authorid=3243" -m 1 -t HTML
+
+    novel_to_any.pl -s Jjwxc -q 作品 -v 何以笙箫默 -m 1 -t HTML
+
+=head2 解析TXT，转换为HTML
+
+    dzs_to_html.pl -w 顾漫 -b 何以笙箫默 -o hy1.txt
+
+=head2 解析TXT，导入wordpress空间
+
+    dzs_to_wordpress.pl -W 顾漫 -b 何以笙箫默 -o hy.txt -c 言情 -w http://xxx.xxx.com  -u xxx -p xxx
+
+=head1 函数
+
+=head2 new 初始化
+
+    my $xs = Novel::Robot->new();
+
+=head2 set_parser 设置解析引擎
+
+    $xs->set_parser('Jjwxc');
+
+=head2 set_packer 设置打包引擎
+
+    $xs->set_packer('HTML');
+
+=head2 get_book 下载整本小说
+
+    $xs->set_parser('Jjwxc');
+
+    my $index_url = 'http://www.jjwxc.net/onebook.php?novelid=2456';
+
+    $xs->get_book($index_url);
+
+
+    $xs->set_parser('TXT');
+
+    $xs->get_book({ writer => '顾漫', book => '何以笙箫默', 
+            path => [ '/somepath/somefile.txt' ] });
+
+=head2 select_book 在Term下选择小说
+
+    $xs->set_parser('Jjwxc');
+
+    my $writer_url = 'http://www.jjwxc.net/oneauthor.php?authorid=3243';
+    my $writer_ref = $xs->{parser}->get_writer_ref($writer_url);
+    my $select_ref = $xs->select_book($writer_ref);
+
+    my $keyword = '作者';
+    my $value='顾漫';
+    $books_ref = $xs->{parser}->get_query_ref($keyword, $value);
+    my $select_ref = $xs->select_book($query_ref);
+
+=head1 工具
+
+=head2 小说导出为TXT
+
+=begin html
+
+<a href="doc/novel_to_txt.pod">novel_to_txt.pl</a>
+
+=end html
+
+=head2 小说导出为HTML
+
+=begin html
+
+<a href="doc/novel_to_html.pod">novel_to_html.pl</a>
+
+=end html
+
+=head2 小说导出到wordpress
+
+=begin html
+
+<a href="doc/novel_to_wordpress.pod">novel_to_wordpress.pl</a>
+
+=end html
+
+=head2 小说批量处理
+
+=begin html
+
+<a href="doc/novel_to_any.pod">novel_to_any.pl</a>
+
+=end html
+
+=head2 TXT电子书转换为HTML
+
+=begin html
+
+<a href="doc/dzs_to_html.pod">dzs_to_html.pl</a>
+
+=end html
+
+=head2 TXT电子书导出到wordpress
+
+=begin html
+
+<a href="doc/dzs_to_wordpress.pod">dzs_to_wordpress.pl</a>
+
+=end html
+=cut
+
