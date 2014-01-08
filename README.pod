@@ -20,51 +20,73 @@ L<Shunong|http://book.shunong.com>
 
 =head2 支持小说输出形式
 
-TXT
+    TXT
+    HTML
+    Markdown
+    WordPress
 
-HTML
-
-Markdown
-
-WordPress
-
-=head1 例子
+=head1 工具
 
 =head2 下载小说，存成txt/html
 
     get_novel.pl [index_url] [type]
 
     get_novel.pl "http://www.dddbbb.net/html/18451/index.html" TXT
-
     get_novel.pl "http://www.jjwxc.net/onebook.php?novelid=2456" HTML
-
     get_novel.pl "http://www.jjwxc.net/onebook.php?novelid=2456" Markdown
 
-=head2 转换小说格式，需要预先安装calibre的ebook-convert
+=head2 解析TXT，转换为HTML
+
+    dzs_to_html.pl -w [作者] -b [书名] -f [TXT文件或目录] -r [章节标题匹配的正则式]
+
+    dzs_to_html.pl -w 顾漫 -b 何以笙箫默 -f hy1.txt
+    dzs_to_html.pl -w 顾漫 -b 何以笙箫默 -f hy1.txt,hy2.txt,dir1 -r "第[ \\t\\d]+章"
+
+=head2 转换小说格式
     
     convert_novel.pl [src_file] [type]
+
+    需要预先安装calibre的ebook-convert，源文件名称格式为 [作者-书名]
 
     convert_novel.pl 施定柔-迷侠记.html mobi
 
     convert_novel.pl 施定柔-迷侠记.html epub
 
-=head2 下载小说，导入wordpress空间
+=head2 将小说导入wordpress空间
 
-    novel_to_wordpress.pl -b "http://www.jjwxc.net/onebook.php?novelid=2456" -c 原创 -w http://xxx.xxx.com  -u xxx -p xxx
+    dzs_to_wordpress.pl -b [book_url] -c [categories] -T [tags] -W [wordpress_url] -u [username] -p [password] 
+    dzs_to_wordpress.pl -w [writer_name] -b [book_name] -f [src_file] -c [categories] -T [tags] -W [wordpress_url] -u [username] -p [password] 
+
+    dzs_to_wordpress.pl -b "http://www.dddbbb.net/html/18451/index.html" -c 言情 -W http://xxx.xxx.com  -u xxx -p xxx
+    dzs_to_wordpress.pl -b "http://www.jjwxc.net/onebook.php?novelid=2456" -c 原创 -W http://xxx.xxx.com  -u xxx -p xxx
+    dzs_to_wordpress.pl -w 顾漫 -b 何以笙箫默 -f hy.txt -c 言情 -W http://xxx.xxx.com  -u xxx -p xxx
+    dzs_to_wordpress.pl -w 施定柔 -b 迷行记 -f mx1.txt,mx2.txt -c 言情 -W http://xxx.xxx.com  -u xxx -p xxx
 
 =head2 批量处理小说(支持to TXT/HTML/...)
 
-    novel_to_any.pl -w "http://www.jjwxc.net/oneauthor.php?authorid=3243" -m 1 -t HTML
+    novel_robot.pl -w [writer_url] -m [select_menu_or_not] -t [packer_type]
+    novel_robot.pl -s [site] -q [query_type] -k [query_keyword] -m [select_menu_or_not] -t [packer_type]
 
-    novel_to_any.pl -s Jjwxc -q 作品 -v 何以笙箫默 -m 1 -t HTML
+    novel_robot.pl -w "http://www.jjwxc.net/oneauthor.php?authorid=3243" -m 1 -t HTML
+    novel_robot.pl -s Jjwxc -q 作品 -k 何以笙箫默 -m 1 -t HTML
 
-=head2 解析TXT，转换为HTML
+=head1 命令行参数
 
-    dzs_to_html.pl -w 顾漫 -b 何以笙箫默 -o hy1.txt
-
-=head2 解析TXT，导入wordpress空间
-
-    dzs_to_wordpress.pl -W 顾漫 -b 何以笙箫默 -o hy.txt -c 言情 -w http://xxx.xxx.com  -u xxx -p xxx
+    -b : book url，小说目录页 / book name，书名
+    -c : categories，小说类别，例如 原创
+    -f : 指定文本来源(可以是单个目录或文件)
+    -i : chapter ids，章节序号，例如 1,4-7,10
+    -k : 查询的关键字
+    -m : 是否输出小说选择菜单
+    -p : wordpress 密码
+    -q : 查询的类型
+    -r : 指定分割章节的正则表达式(例如："第[ \\t\\d]+章")
+    -s : 指定查询的站点
+    -t : 小说保存类型，例如TXT/HTML
+    -T : tags，标签，例如 顾漫
+    -u : wordpress 用户
+    -w : writer url 作者专栏URL / writer name 作者名
+    -W : wordpress 地址
 
 =head1 函数
 
@@ -83,14 +105,11 @@ WordPress
 =head2 get_book 下载整本小说
 
     $xs->set_parser('Jjwxc');
-
     my $index_url = 'http://www.jjwxc.net/onebook.php?novelid=2456';
-
     $xs->get_book($index_url);
 
 
     $xs->set_parser('TXT');
-
     $xs->get_book({ writer => '顾漫', book => '何以笙箫默', 
             path => [ '/somepath/somefile.txt' ] });
 
@@ -107,37 +126,4 @@ WordPress
     $books_ref = $xs->{parser}->get_query_ref($keyword, $value);
     my $select_ref = $xs->select_book($query_ref);
 
-=head1 工具
-
-=head2 小说导出到wordpress
-
-=begin html
-
-<a href="doc/novel_to_wordpress.pod">novel_to_wordpress.pl</a>
-
-=end html
-
-=head2 小说批量处理
-
-=begin html
-
-<a href="doc/novel_to_any.pod">novel_to_any.pl</a>
-
-=end html
-
-=head2 TXT电子书转换为HTML
-
-=begin html
-
-<a href="doc/dzs_to_html.pod">dzs_to_html.pl</a>
-
-=end html
-
-=head2 TXT电子书导出到wordpress
-
-=begin html
-
-<a href="doc/dzs_to_wordpress.pod">dzs_to_wordpress.pl</a>
-
-=end html
 =cut

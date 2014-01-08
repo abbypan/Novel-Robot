@@ -13,7 +13,7 @@ use Parallel::ForkManager;
 use Novel::Robot::Parser;
 use Novel::Robot::Packer;
 
-our $VERSION = 0.27;
+our $VERSION = 0.28;
 
 has parser          => ( is => 'rw', );
 has packer          => ( is => 'rw', );
@@ -34,6 +34,7 @@ sub set_packer {
     $self->{packer} = $packer_base->init_packer(@packer_args);
 
 } ## end sub set_packer
+
 
 sub get_book {
     my ( $self, $index_url, $o ) = @_;
