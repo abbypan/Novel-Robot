@@ -10,13 +10,10 @@ L<Novel::Robot> 小说下载器
 
 =head2 支持小说站点
 
-L<Jjwxc|http://www.jjwxc.net>
-
-L<Dddbbb|http://www.dddbbb.net>
-
-L<Nunu|http://book.kanunu.org>
-
-L<Shunong|http://book.shunong.com>
+    Jjwxc   : http://www.jjwxc.net
+    Dddbbb  : http://www.dddbbb.net
+    Nunu    : http://book.kanunu.org
+    Shunong : http://book.shunong.com
 
 =head2 支持小说输出形式
 
@@ -49,7 +46,6 @@ L<Shunong|http://book.shunong.com>
     需要预先安装calibre的ebook-convert，源文件名称格式为 [作者-书名]
 
     convert_novel.pl 施定柔-迷侠记.html mobi
-
     convert_novel.pl 施定柔-迷侠记.html epub
 
 =head2 将小说导入wordpress空间
