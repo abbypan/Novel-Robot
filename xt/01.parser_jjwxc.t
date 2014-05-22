@@ -1,12 +1,25 @@
 #!/usr/bin/perl
 use utf8;
+use lib '../Novel-Robot/lib';
 use Novel::Robot;
 use Test::More ;
 use Data::Dump qw/dump/;
 
-my $xs = Novel::Robot->new();
-$xs->set_parser('Jjwxc');
-$xs->set_packer('HTML');
+my $xs = Novel::Robot::Parser->new(site=>'Jjwxc');
+
+
+my $u = 'http://www.jjwxc.net/onebook.php?novelid=2530';
+my $xx = Novel::Robot->new(site => $u, type => 'html');
+#my $r = $xx->get_book($u, output_scalar=>1);
+my ($r, $x) = $xx->get_book($u, output_scalar=>1);
+#print ref($r);
+dump($x);
+exit;
+
+#my $x = $xs->get_index_ref('http://www.jjwxc.net/onebook.php?novelid=1945417');
+#use Encode;
+#print encode('cp936', "writer:$x->{writer},book: $x->{book}\n");
+#exit;
 
 my $index_url = 'http://www.jjwxc.net/onebook.php?novelid=2456';
 my $chapter_url = "$index_url&chapterid=1";

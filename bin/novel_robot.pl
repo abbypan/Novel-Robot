@@ -13,9 +13,10 @@ $| = 1;
 my %opt;
 getopt( 'wsqkmt', \%opt );
 
-my $xs = Novel::Robot->new();
-$xs->set_packer($opt{t} || 'TXT');
-$xs->set_parser($opt{w} || $opt{s});
+my $xs = Novel::Robot->new(
+    type => $opt{t} ? $opt{t} : 'html', 
+    site => $opt{w} || $opt{s}, 
+);
 
 my $books_ref;
 if($opt{w}){

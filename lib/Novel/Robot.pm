@@ -1,4 +1,4 @@
-# ABSTRACT:  小说下载器
+# ABSTRACT: download novel 小说下载器
 package Novel::Robot;
 use strict;
 use warnings;
@@ -7,126 +7,47 @@ use utf8;
 use Encode::Locale;
 use Encode;
 use Term::Menus;
-use Moo;
 use Parallel::ForkManager;
 
 use Novel::Robot::Parser;
 use Novel::Robot::Packer;
 
-our $VERSION = 0.28;
+our $VERSION = 0.31;
 
-has parser          => ( is => 'rw', );
-has packer          => ( is => 'rw', );
-has max_process_num => ( is => 'rw', default => sub { 3 } );
+sub new {
+    my ( $self, %opt ) = @_;
+    $opt{max_process_num} ||= 3;
+    $opt{type}            ||= 'html';
+
+    my $parser  = Novel::Robot::Parser->new(%opt);
+    my $packer  = Novel::Robot::Packer->new(%opt);
+    my $browser = $parser->{browser};
+    bless { %opt, parser => $parser, packer => $packer, browser => $browser },
+      __PACKAGE__;
+}
 
 sub set_parser {
-    my ( $self, @parser_args ) = @_;
-
-    my $parser_base = new Novel::Robot::Parser();
-    $self->{parser} = $parser_base->init_parser(@parser_args);
-
+    my ( $self, $site ) = @_;
+    $self->{site} = $self->{parser}->detect_site($site);
+    bless $self->{parser}, "Novel::Robot::Parser::$self->{site}";
 } ## end sub set_parser
 
 sub set_packer {
-    my ( $self, @packer_args ) = @_;
-
-    my $packer_base = new Novel::Robot::Packer();
-    $self->{packer} = $packer_base->init_packer(@packer_args);
-
+    my ( $self, $type ) = @_;
+    $self->{type} = $type;
+    bless $self->{packer}, "Novel::Robot::Packer::$self->{type}";
 } ## end sub set_packer
 
-
 sub get_book {
-    my ( $self, $index_url, $o ) = @_;
-    $o ||= {};
+    my ( $self, $index_url, %o ) = @_;
 
-    my $parser    = $self->{parser};
-    my $index_ref = $parser->get_index_ref($index_url);
-    return unless ($index_ref);
+    my $book_ref = $self->{parser}->get_book_ref( $index_url, %o );
+    return unless ($book_ref);
 
-    my $pk = $self->{packer};
-    my ( $w_sub, $end_sub ) = $pk->open_packer( $index_ref, $o );
-
-    $pk->write_packer( $w_sub, $pk->format_before_index($index_ref) );
-    $pk->write_packer( $w_sub, $pk->format_index($index_ref) );
-    $pk->write_packer( $w_sub, $pk->format_before_chapter($index_ref) );
-
-    my $chap_ids = $self->{parser}->get_chapter_ids( $index_ref, $o );
-
-    my ( $add_chap_sub, $work_chap_sub, $del_chap_sub ) =
-      $self->get_chapter_iter($chap_ids);
-
-    my $pm = Parallel::ForkManager->new( $self->{max_process_num} );
-    $pm->run_on_finish(
-        sub {
-            my ( $pid, $exit_code, $ident, $exit, $core, $chap ) = @_;
-            return unless($chap);
-
-            $add_chap_sub->($chap);
-
-            while ( my $chap_r = $work_chap_sub->() ) {
-
-                $pk->write_packer( $w_sub, $pk->format_chapter($chap_r) )
-                unless ( $parser->is_empty_chapter($chap_r) );
-
-                $del_chap_sub->();
-            }
-        }
-    );
-
-    for my $i (@$chap_ids) {
-        my $chap_r = $parser->get_nth_chapter_info( $index_ref, $i );
-        my $is_empty_chapter = $parser->is_empty_chapter($chap_r);
-
-        my $pid = $pm->start and next;
-
-        my $r = $is_empty_chapter ? 
-            $parser->get_chapter_ref( $chap_r->{url}, $chap_r->{id} )
-            : $chap_r ;
-
-        $pm->finish( 0, $r );
-
-    } ## end for my $i ( 1 .. $index_ref...)
-
-    $pm->wait_all_children;
-
-    $pk->write_packer( $w_sub, $pk->format_after_chapter($index_ref) );
-
-    return $end_sub->() if($end_sub and ref($end_sub) eq 'CODE');
-
-    return $end_sub;
+    $self->{packer}->format_book_output( $book_ref, \%o );
+    my $r = $self->{packer}->main( $book_ref, %o );
+    return wantarray ? ( $r, $book_ref ) : $r;
 } ## end sub get_book
-
-sub get_chapter_iter {
-    my ( $self, $chap_ids ) = @_;
-    return unless ($chap_ids);
-
-    my %chap_window;
-    my $work_index = 0;
-    my $work_num   = scalar(@$chap_ids);
-
-    my $add_chap_sub = sub {
-        my ($chap) = @_;
-        $chap_window{ $chap->{id} } = $chap;
-    };
-
-    my $work_chap_sub = sub {
-        return unless ( $work_index < $work_num );
-
-        my $i = $chap_ids->[$work_index];
-        return unless ( exists $chap_window{$i} );
-
-        return $chap_window{$i};
-    };
-
-    my $del_chap_sub = sub {
-        my $i = $chap_ids->[$work_index];
-        $chap_window{$i} = undef;
-        $work_index++;
-    };
-
-    return ( $add_chap_sub, $work_chap_sub, $del_chap_sub );
-}
 
 sub select_book {
     my ( $self, $info_ref ) = @_;
@@ -159,7 +80,6 @@ sub select_book {
 } ## end sub select_book
 
 sub split_id_list {
-
     #1,3,9-11
     my ( $self, $id_list ) = @_;
 
@@ -175,5 +95,4 @@ sub split_id_list {
     return \@chap_ids;
 }
 
-no Moo;
 1;
