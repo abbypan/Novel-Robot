@@ -4,23 +4,15 @@
 
 =head1 NAME
 
-L<Novel::Robot> 小说下载器
+L<Novel::Robot> download novel 小说下载器
 
-=head2 支持小说站点
+=head2 site 支持小说站点
 
-    jjwxc   : http://www.jjwxc.net
-    dddbbb  : http://www.dddbbb.net
-    kanunu  : http://book.kanunu.org
-    shunong : http://book.shunong.com
-    asxs    : http://www.23hh.com
-    luoqiu  : http://www.luoqiu.com
+见 L<Novel::Robot::Parser>
 
-=head2 支持小说输出形式
+=head2 type 支持小说输出形式
 
-    html
-    jekyll
-    txt
-    wordpress
+见 L<Novel::Robot::Packer>
 
 =head1 TOOL
 
@@ -68,11 +60,11 @@ L<Novel::Robot> 小说下载器
 
 =head2 批量处理小说(支持to txt/html/...)
 
-    novel_robot.pl -w [writer_url] -m [select_menu_or_not] -t [packer_type]
-    novel_robot.pl -s [site] -q [query_type] -k [query_keyword] -m [select_menu_or_not] -t [packer_type]
+    get_novel.pl -w [writer_url] -m [select_menu_or_not] -t [packer_type]
+    get_novel.pl -s [site] -q [query_type] -k [query_keyword] -m [select_menu_or_not] -t [packer_type]
 
-    novel_robot.pl -w "http://www.jjwxc.net/oneauthor.php?authorid=3243" -m 1 -t html
-    novel_robot.pl -s jjwxc -q 作品 -k 何以笙箫默 -m 1 -t html
+    get_novel.pl -w "http://www.jjwxc.net/oneauthor.php?authorid=3243" -m 1 -t html
+    get_novel.pl -s jjwxc -q 作品 -k 何以笙箫默 -m 1 -t html
 
 =head1 ARG
 
@@ -133,17 +125,29 @@ L<Novel::Robot> 小说下载器
     $xs->get_book({ writer => '顾漫', book => '何以笙箫默', 
             path => [ '/somepath/somefile.txt' ] });
 
-=head2 select_book 在Term下选择小说
+=head2 下载作者专栏
 
     $xs->set_parser('jjwxc');
-
     my $writer_url = 'http://www.jjwxc.net/oneauthor.php?authorid=3243';
-    my $writer_ref = $xs->{parser}->get_writer_ref($writer_url);
-    my $select_ref = $xs->select_book($writer_ref);
+    my ($writer_name, $books_ref) = $xs->{parser}->get_writer_ref($writer_url, %opt);
+    $xs->get_book($_, %opt) for @$books_ref;
+
+=head2  查询并下载
 
     my $query_type = '作者';
-    my $keyword='顾漫';
-    $books_ref = $xs->{parser}->get_query_ref($query_type, $keyword);
-    my $select_ref = $xs->select_book($query_ref);
+    my $query_keyword='顾漫';
+    my ($info, $items_ref) = $xs->{parser}->get_query_ref($query_keyword, query_type => $query_type, %opt);
+    $xs->get_book($_, %opt) for @$items_ref;
+
+=head2  下载版块
+
+    $xs->set_parser('hjj');
+    my $board_url = "http://bbs.jjwxc.net/showmsg.php?board=153";
+    my ($info, $tiezis_ref) = $xs->{parser}->get_board_ref($board_url, %opt);
+    $xs->get_book($_, %opt) for @$tiezis_ref;
+
+=head2 select_book 在Term下选择小说
+
+    my $select_books_ref = $xs->select_book($banner_info, $books_ref);
 
 =cut
