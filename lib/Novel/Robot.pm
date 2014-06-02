@@ -50,33 +50,33 @@ sub get_book {
 } ## end sub get_book
 
 sub select_book {
-    my ( $self, $info_ref ) = @_;
+    my ( $self, $banner, $item_list ) = @_;
 
-    my %menu = ( 'Select' => 'Many', 'Banner' => 'Book List', );
+    my %item = map {
+        my $class = $_->{series} || $_->{writer} || '';
+        my $name = $_->{book} || $_->{title} || '';
+        my $n = "$class --- $name";
 
-    #菜单项，不搞层次了，恩
-    my %select;
-    my $i = 1;
-    for my $r (@$info_ref) {
-        my $info = $r->{series} || $r->{writer} || '';
-        my $item = "$info --- $r->{book}";
-        $select{$item} = $r->{url};
-        $item = encode( locale => $item );
-        $menu{"Item_$i"} = { Text => $item };
-        $i++;
-    } ## end for my $r (@$info_ref)
+        $n => $_->{url};
+    } @$item_list;
 
-    #最后选出来的小说
-    my @select_result;
-    for my $item ( &Menu( \%menu ) ) {
-        $item = decode( locale => $item );
-        my ( $info, $book ) = ( $item =~ /^(.*) --- (.*)$/ );
-        push @select_result,
-          { info => $info, book => $book, url => $select{$item} };
-    }
+    my %menu = ( 
+        Select => 'Many', 
+        Banner => $banner || 'Select List', 
+        Item_1 => {
+            Text => "]Convey[", 
+            Convey => [ sort keys %item ],
+        }, 
+    );
 
-    return \@select_result;
+    my @select_items = &Menu(\%menu);
+    my @select_results =
+    map {
+        my ( $class, $name ) = /^(.*) --- (.*)$/;
+        { class => $class, name => $name, url => $item{$_} };
+    } @select_items;
 
+    return \@select_results;
 } ## end sub select_book
 
 sub split_id_list {

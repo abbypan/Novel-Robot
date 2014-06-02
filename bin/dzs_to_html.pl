@@ -9,11 +9,12 @@ use Encode::Locale;
 use Encode;
 use File::Find::Rule;
 use Getopt::Std;
-use Novel::Robot::Packer::HTML;
+use Novel::Robot::Packer;
 
 my %opt;
-getopt( 'wbfr', \%opt );
+getopt( 'wbfrt', \%opt );
 exit unless ( defined $opt{f} );
+$opt{t} ||= 'html';
 
 my @path = split ',', $opt{f};
 my $r = parse_index(
@@ -22,7 +23,7 @@ my $r = parse_index(
     book        => decode(locale=> $opt{b}), 
     chapter_regex => $opt{r} ? decode(locale=>$opt{r}) : undef, 
 );
-my $pk = Novel::Robot::Packer::HTML->new();
+my $pk = Novel::Robot::Packer->new(type => $opt{t});
 $pk->pack_book( $r );
 
 sub parse_index {

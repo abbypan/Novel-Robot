@@ -76,25 +76,32 @@ L<Novel::Robot> 小说下载器
 
 =head1 ARG
 
+    -A : only poster, 贴子只看楼主
+    -C : with toc, 小说保存时是否生成目录(默认是)
+    -F : max floor num, 贴子最大楼层数
+    -I : query/board/writer page range, 结果列表只取 x-y 页
+    -M : max query_item/board_tiezi/writer_novel num, 结果列表最多取x项
+    -N : min word num , 贴子每层最小字数
+    -P : max process num, 进程个数 
+    -R : remark , 一些补充说明
+    -S : show progress bar, 显示进度条(默认显示)
+    -T : tag list，标签，例如 顾漫
+    -W : wordpress 地址
     -b : book url，小说目录页 / book name，书名
-    -c : categories，小说类别，例如 原创
-    -f : 指定文本来源(可以是单个目录或文件)
-    -i : chapter ids，章节序号，例如 1，或者 4-7
-    -k : 查询的关键字
-    -m : 是否输出小说选择菜单
-    -p : wordpress 密码
-    -q : 查询的类型
-    -r : 指定分割章节的正则表达式(例如："第[ \\t\\d]+章")
-    -s : 指定查询的站点
-    -t : 小说保存类型，例如txt/html
-    -o : 保存的小说文件名
-    -n : 单个文件最大章节数(一本小说可以分多个文件，每个文件最多n章)
-    -C : 小说保存时是否生成目录(默认是)
-    -S : 显示进度条(默认显示)
-    -T : tags，标签，例如 顾漫
+    -c : category list，小说类别，例如 原创
+    -f : txt file / txt file dir, 指定文本文件来源(可以是单个目录或文件)
+    -i : chapter id range，只取 x-y 章
+    -k : query keyword, 查询的关键字
+    -m : select menu, 是否输出小说选择菜单
+    -n : split chapter num, 单个文件最大章节数(一本小说可以分多个文件，每个文件最多n章)
+    -o : output filename, 保存的小说文件名
+    -p : password, wordpress 密码
+    -q : query type, 查询的类型
+    -r : chapter regex, 指定分割章节的正则表达式(例如："第[ \\t\\d]+章")
+    -s : site, 指定查询的站点
+    -t : save type, 小说保存类型，例如txt/html
     -u : wordpress 用户
     -w : writer url 作者专栏URL / writer name 作者名
-    -W : wordpress 地址
 
 =head1 FUNCTION
 
