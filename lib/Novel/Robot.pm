@@ -12,7 +12,7 @@ use Parallel::ForkManager;
 use Novel::Robot::Parser;
 use Novel::Robot::Packer;
 
-our $VERSION = 0.31;
+our $VERSION = 0.32;
 
 sub new {
     my ( $self, %opt ) = @_;
@@ -38,23 +38,23 @@ sub set_packer {
     bless $self->{packer}, "Novel::Robot::Packer::$self->{type}";
 } ## end sub set_packer
 
-sub get_book {
+sub get_item {
     my ( $self, $index_url, %o ) = @_;
 
-    my $book_ref = $self->{parser}->get_book_ref( $index_url, %o );
-    return unless ($book_ref);
+    my $item_ref = $self->{parser}->get_item_ref( $index_url, %o );
+    return unless ($item_ref);
 
-    $self->{packer}->format_book_output( $book_ref, \%o );
-    my $r = $self->{packer}->main( $book_ref, %o );
-    return wantarray ? ( $r, $book_ref ) : $r;
-} ## end sub get_book
+    $self->{packer}->format_item_output( $item_ref, \%o );
+    my $r = $self->{packer}->main( $item_ref, %o );
+    return wantarray ? ( $r, $item_ref ) : $r;
+} ## end sub get_item
 
-sub select_book {
+sub select_item {
     my ( $self, $banner, $item_list ) = @_;
 
     my %item = map {
-        my $class = $_->{series} || $_->{writer} || '';
-        my $name = $_->{book} || $_->{title} || '';
+        my $class = $_->{series} || $_->{writer} || $_->{board} || '';
+        my $name = $_->{book} || $_->{title} || $_->{topic} || '';
         my $n = "$class --- $name";
 
         $n => $_->{url};
@@ -77,7 +77,7 @@ sub select_book {
     } @select_items;
 
     return \@select_results;
-} ## end sub select_book
+} ## end sub select_item
 
 sub split_id_list {
     #1,3,9-11
