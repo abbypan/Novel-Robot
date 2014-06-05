@@ -72,10 +72,11 @@ L<Novel::Robot::Packer>
 
     -A : only_poster, 贴子只看楼主
     -C : with_toc, 小说保存时是否生成目录(默认是)
-    -F : max_floor_num, 贴子最大楼层数
-    -I : {min/max}_{query/board/writer}_page, 结果列表只取 x-y 页
-    -M : max_{query_item/board_tiezi/writer_novel}_num, 结果列表最多取x项
-    -N : min_word_num , 贴子每层最小字数
+    -I : {min/max}_{query/board}_page, 结果列表只取 x-y 页
+    -M : max_{query_item/board_item}_num, 结果列表最多取x项
+    -i : {min/max}_{tiezi_page/chapter_num}, 只取 x-y 章
+    -m : max_tiezi_floor_num, 结果列表最多取x项
+    -N : min_floor_word_num, 贴子每层最小字数
     -P : password, wordpress 密码
     -R : remark, 一些补充说明
     -v : verbose, 显示进度条(默认显示)
@@ -84,9 +85,8 @@ L<Novel::Robot::Packer>
     -S : ...wordpress packer 站点地址
     -c : category，小说类别，例如 原创
     -f : ...txt file / txt file dir, 指定文本文件来源(可以是单个目录或文件)
-    -i : ...chapter id range，只取 x-y 章
     -k : query keyword, 查询的关键字
-    -m : select menu, 是否输出小说选择菜单
+    -E : select menu, 是否输出小说选择菜单
     -n : split chapter num, 单个文件最大章节数(一本小说可以分多个文件，每个文件最多n章)
     -o : output filename, 保存的小说文件名
     -p : max_process_num, 进程个数 
