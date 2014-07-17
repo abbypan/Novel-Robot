@@ -18,7 +18,7 @@ my $convert_file = convert_novel(%opt);
 send_novel($convert_file, %opt) if($opt{d});
 
 sub convert_novel {
-    my ($f, %opt) = @_;
+    my (%opt) = @_;
     $opt{t} ||= 'mobi';
 
     my $dst_file = $opt{f};

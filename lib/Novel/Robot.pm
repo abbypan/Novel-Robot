@@ -1,4 +1,4 @@
-# ABSTRACT: download novel 小说下载器
+# ABSTRACT: download novel /bbs thread
 package Novel::Robot;
 use strict;
 use warnings;
@@ -12,7 +12,7 @@ use Parallel::ForkManager;
 use Novel::Robot::Parser;
 use Novel::Robot::Packer;
 
-our $VERSION = 0.32;
+our $VERSION = 0.33;
 
 sub new {
     my ( $self, %opt ) = @_;
@@ -54,36 +54,37 @@ sub select_item {
 
     my %item = map {
         my $class = $_->{series} || $_->{writer} || $_->{board} || '';
-        my $name = $_->{book} || $_->{title} || $_->{topic} || '';
-        my $n = "$class --- $name";
+        my $name  = $_->{book}   || $_->{title}  || $_->{topic} || '';
+        my $n     = "$class --- $name";
 
         $n => $_->{url};
     } @$item_list;
 
-    my %menu = ( 
-        Select => 'Many', 
-        Banner => $banner || 'Select List', 
+    my %menu = (
+        Select => 'Many',
+        Banner => $banner || 'Select List',
         Item_1 => {
-            Text => "]Convey[", 
+            Text   => "]Convey[",
             Convey => [ sort keys %item ],
-        }, 
+        },
     );
 
-    my @select_items = &Menu(\%menu);
+    my @select_items = &Menu( \%menu );
     my @select_results =
-    map {
+      map {
         my ( $class, $name ) = /^(.*) --- (.*)$/;
         { class => $class, name => $name, url => $item{$_} };
-    } @select_items;
+      } @select_items;
 
     return \@select_results;
 } ## end sub select_item
 
 sub split_id_list {
-    #1,3,9-11
-    my ( $self, $id_list ) = @_;
 
-    my @id_list = split ',', $id_list;
+    #id_list_str : 1,3,9-11
+    my ( $self, $id_list_str ) = @_;
+
+    my @id_list = split ',', $id_list_str;
 
     my @chap_ids;
     for my $i (@id_list) {
