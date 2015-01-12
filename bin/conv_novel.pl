@@ -11,18 +11,20 @@ $|=1;
 #binmode(STDERR, ":encoding(console_out)");
 
 my %opt;
-getopt( 'ftwbsdhup', \%opt );
+getopt( 'ftwb', \%opt );
 
 my $convert_file = convert_novel(%opt);
-
-send_novel($convert_file, %opt) if($opt{d});
 
 sub convert_novel {
     my (%opt) = @_;
     $opt{t} ||= 'mobi';
 
-    my $dst_file = $opt{f};
-    $dst_file=~s/[a-z0-9]+$/$opt{t}/i;
+    my $dst_file= $opt{t};
+    unless($dst_file=~/[^.]+\.[^.]+$/){
+        $dst_file = $opt{f};
+        $dst_file=~s/[a-z0-9]+$/$opt{t}/i;
+    }
+    print "$opt{f} => $dst_file\n";
 
     my ($writer,$book) = $opt{f}=~/([^\\\/]+?)-(.+?)\.[^.]+$/;
     my %conv = (
@@ -37,14 +39,4 @@ sub convert_novel {
     my $cmd=qq[ebook-convert "$opt{f}" "$dst_file" $conv_str]; 
     system($cmd);
     return $dst_file;
-}
-
-sub send_novel {
-    my ($f, %opt) = @_;
-
-    my $cmd =qq[sendEmail -u '' -m 'novel' -f $opt{s} -t $opt{d} -a $f -vv];
-
-    $cmd.= qq[ -s $opt{h} -xu $opt{u} -xp $opt{p}] if($opt{h});
-
-    system($cmd);
 }

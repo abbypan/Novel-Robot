@@ -24,17 +24,21 @@ L<Novel::Robot::Packer>
 
     get_novel.pl -u "http://www.dddbbb.net/html/18451/index.html" -t txt
     get_novel.pl -u "http://www.jjwxc.net/onebook.php?novelid=2456" -t html
+    get_novel.pl -u "http://www.jjwxc.net/onebook.php?novelid=2456" -t web -o some_dir
     get_novel.pl -u "http://www.jjwxc.net/onebook.php?novelid=2456" -t jekyll -T [标签] -c [类别]  -R [说明]
-
-    get_novel.pl -w [作者] -u [书名] -f [txt文件或目录] -r [章节标题匹配的正则式] -t [目标文件类型]
-    get_novel.pl -w 顾漫 -u 何以笙箫默 -f hy1.txt -t html
-    get_novel.pl -w 顾漫 -u 何以笙箫默 -f hy1.txt,hy2.txt,dir1 -r "第[ \\t\\d]+章" -t html
 
 =head2 分段下载小说
 
     get_novel_split.pl -u [小说目录页url] -t [目标类型] -n [分段章节数] -C [是否写目录] -v [是否显示进度条]
 
     get_novel_split.pl -u "http://www.jjwxc.net/onebook.php?novelid=2456" -n 10 -t jekyll
+
+=head2 转换txt，加目录
+
+    get_novel.pl -w [作者] -u [书名] -f [txt文件或目录] -r [章节标题匹配的正则式] -t [目标文件类型]
+    get_novel.pl -w 顾漫 -u 何以笙箫默 -f hy1.txt -t html
+    get_novel.pl -w 顾漫 -u 何以笙箫默 -f hy1.txt,hy2.txt,dir1 -r "第[ \\t\\d]+章" -t html
+    get_novel.pl -f 天平-风起阿房.txt -t html
 
 =head2 将小说发布到wordpress
 
@@ -48,7 +52,7 @@ L<Novel::Robot::Packer>
     get_novel.pl -w 施定柔 -u 迷行记 -f mx1.txt,mx2.txt -c 言情 -W http://xxx.xxx.com  -U xxx -P xxx
 
 
-=head2 批量处理小说(支持to txt/html/...)
+=head2 批量下载小说
 
     get_novel.pl -b [board_url/writer_url] -m [select_menu_or_not] -t [packer_type]
     get_novel.pl -s [site] -q [query_type] -k [query_keyword] -m [select_menu_or_not] -t [packer_type]
@@ -86,29 +90,46 @@ L<Novel::Robot::Packer>
     -w : writer url 作者专栏URL / writer name 作者名
     -B : 版块序号，例如hjj的xq版块号为3
 
-=head1 convert_novel.pl
+=head1 conv_novel.pl
 
-    convert_novel.pl -f [源文件] -t [目标文件类型(小写)] -w [作者] -b [书名] -s [源邮箱] -d [目标邮箱] -h [远程smtp服务器] -u [邮箱帐号] -p [邮箱密码]
+    conv_novel.pl -f [源文件] -t [目标文件类型(小写)] -w [作者] -b [书名]
 
 =head2 转换小说
 
+    将下载的 html格式 的小说转换成 其他格式的电子书，例如epub、mobi等等
+
     需要预先安装calibre的ebook-convert，源文件名称格式默认为 [作者-书名]
     
-    convert_novel.pl -f 施定柔-迷侠记.html -t mobi
+    conv_novel.pl -f 天平-风起阿房.html -t mobi
+    conv_novel.pl -f 施定柔-迷侠记.html -t epub
 
-    convert_novel.pl -f 施定柔-迷侠记.html -t epub
+=head1 get_ebook.pl
 
-=head2 转换小说，并将转换后的小说发送到指定邮箱
+    简单下载电子书
+
+    get_ebook.pl [小说目录页url] [目标文件类型/目标文件名]
+
+    get_ebook.pl "http://www.dddbbb.net/html/18451/index.html" mobi
+
+    get_ebook.pl "http://www.dddbbb.net/html/18451/index.html" abc.mobi
+
+=head1 send_novel.pl
+
+    send_novel.pl -f [源文件] -s [源邮箱] -d [目标邮箱] -h [远程smtp服务器] -u [邮箱帐号] -p [邮箱密码]
+
+=head2 将小说发送到指定邮箱
 
     需要预先安装L<sendEmail|http://caspian.dotconf.net/menu/Software/SendEmail/>
 
     本机已安装smtp服务
 
-    convert_novel.pl -f 施定柔-迷侠记.html -t mobi -s xxx@src.com -t yyy@kindle.com
+    send_novel.pl -f 施定柔-迷侠记.mobi -s xxx@src.com -t yyy@kindle.com
 
     使用远程smtp服务
 
-    convert_novel.pl -f 施定柔-迷侠记.html -t mobi -s xxx@src.com -t yyy@kindle.com -h smtp.src.com -u  xxx -p somepwd
+    send_novel.pl -f 施定柔-迷侠记.mobi -s xxx@src.com -t yyy@kindle.com -h smtp.src.com -u  xxx -p somepwd
+    send_novel.pl -f 施定柔-迷侠记.mobi -s xxx@src.com -t yyy@kindle.com -h smtp.src.com:465 -u  xxx -p somepwd
+    send_novel.pl -f 施定柔-迷侠记.mobi -s xxx@src.com -t yyy@kindle.com -h smtp.src.com:587 -u  xxx -p somepwd
 
 =head1 FUNCTION
 

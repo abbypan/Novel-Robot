@@ -15,11 +15,11 @@ binmode( STDOUT, ":encoding(console_out)" );
 binmode( STDERR, ":encoding(console_out)" );
 
 my %opt;
-getopt( 'sqkmbfrtiCSoTcRAFNPIMnUpvuB', \%opt );
+getopt( 'wsqkmbfrtiCSoTcRAFNPIMnUpvuB', \%opt );
 
 my %opt_out = read_option(%opt);
-
-my $xs = Novel::Robot->new( type => $opt_out{type}, site => $opt_out{site} );
+our $xs = Novel::Robot->new( type => $opt_out{type}, site => $opt_out{site} );
+$opt_out{chapter_ids} = $xs->split_id_list( $opt{i} )  if($opt{i});
 
 my $info;
 my $items_ref;
@@ -54,15 +54,12 @@ if ($items_ref) {
 sub read_option {
     my (%opt) = @_;
 
-    $opt{s} = 'txt' if ( $opt{f} );
-
     my %opt_out = (
         board    => $opt{B},
         book     => $opt{u} ? decode( locale => $opt{u} ) : undef,
         category => $opt{c}
         ? [ split ',', decode( locale => $opt{c} ) ]
         : undef,
-        chapter_ids => $opt{i} ? $xs->split_id_list( $opt{i} ) : undef,
         chapter_regex => $opt{r} ? decode( locale => $opt{r} ) : undef,
         max_process_num => $opt{p} // 3,
         only_poster     => $opt{A},
@@ -104,6 +101,14 @@ sub read_option {
 
     # floor ->
     $opt_out{min_floor_word_num} = $opt{N};
+
+    if($opt{f}){
+        $opt_out{site} = 'txt';
+        my $tf = decode(locale => $opt{f});
+        my ($tw, $tb) = $tf=~m#([^\/\\]+)-([^\/\\]+)\.[^.]+$#;
+        $opt_out{book} = $opt{b} ? decode( locale => $opt{b} ) : $tb,
+        $opt_out{writer} = $opt{w} ? decode( locale => $opt{w} ) : $tw,
+    }
 
     return %opt_out;
 }
