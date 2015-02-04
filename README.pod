@@ -40,6 +40,24 @@ L<Novel::Robot::Packer>
     get_novel.pl -w 顾漫 -u 何以笙箫默 -f hy1.txt,hy2.txt,dir1 -r "第[ \\t\\d]+章" -t html
     get_novel.pl -f 天平-风起阿房.txt -t html
 
+=head2 批量下载小说
+
+    get_novel.pl -b [board_url/writer_url] -m [select_menu_or_not] -t [packer_type]
+    get_novel.pl -s [site] -q [query_type] -k [query_keyword] -m [select_menu_or_not] -t [packer_type]
+
+    get_novel.pl -b "http://www.jjwxc.net/oneauthor.php?authorid=3243" -m 1 -t html
+    get_novel.pl -s jjwxc -q 作品 -k 何以笙箫默 -m 1 -t html
+
+=head2 输出小说信息（不下载）
+
+    get_novel.pl -u [小说目录页url] -D 1
+    get_novel.pl -b [board_url/writer_url] -D 1
+    get_novel.pl -s [site] -q [query_type] -k [query_keyword] -D 1
+
+    get_novel.pl -u "http://www.jjwxc.net/onebook.php?novelid=2456"  -D 1
+    get_novel.pl -b "http://www.jjwxc.net/oneauthor.php?authorid=3243" -D 1
+    get_novel.pl -s jjwxc -q 作品 -k 何以笙箫默 -D 1
+
 =head2 将小说发布到wordpress
 
     get_novel.pl -u [小说目录页url] -c [类别] -T [标签] -W [wordpress页面地址] -U [用户名] -P [密码] 
@@ -52,13 +70,6 @@ L<Novel::Robot::Packer>
     get_novel.pl -w 施定柔 -u 迷行记 -f mx1.txt,mx2.txt -c 言情 -W http://xxx.xxx.com  -U xxx -P xxx
 
 
-=head2 批量下载小说
-
-    get_novel.pl -b [board_url/writer_url] -m [select_menu_or_not] -t [packer_type]
-    get_novel.pl -s [site] -q [query_type] -k [query_keyword] -m [select_menu_or_not] -t [packer_type]
-
-    get_novel.pl -b "http://www.jjwxc.net/oneauthor.php?authorid=3243" -m 1 -t html
-    get_novel.pl -s jjwxc -q 作品 -k 何以笙箫默 -m 1 -t html
 
 =head2 ARG
 
@@ -89,6 +100,7 @@ L<Novel::Robot::Packer>
     -u : ...book url，小说目录页 / book name，书名
     -w : writer url 作者专栏URL / writer name 作者名
     -B : 版块序号，例如hjj的xq版块号为3
+    -D : 只输出信息，不下载，或进行其他处理操作
 
 =head1 conv_novel.pl
 

@@ -15,7 +15,7 @@ binmode( STDOUT, ":encoding(console_out)" );
 binmode( STDERR, ":encoding(console_out)" );
 
 my %opt;
-getopt( 'wsqkmbfrtiCSoTcRAFNPIMnUpvuB', \%opt );
+getopt( 'wsqkmbfrtiCSoTcRAFNPIMnUpvuBD', \%opt );
 
 my %opt_out = read_option(%opt);
 our $xs = Novel::Robot->new( type => $opt_out{type}, site => $opt_out{site} );
@@ -28,7 +28,7 @@ if ( $opt{f} ) {
     my @path = split ',', $opt{f};
     $xs->get_item( \@path, %opt_out );
 }
-elsif ( $opt{b} ) {    #writer
+elsif ( $opt{b} ) {    # writer/ board
     ( $info, $items_ref ) = $xs->{parser}->get_board_ref( $opt{b}, %opt_out );
 }
 elsif ( $opt{q} ) {    #query
@@ -39,15 +39,25 @@ elsif ( $opt{n} ) {
     get_novel_split( $xs, $opt{u}, %opt_out );
 }
 elsif ( $opt{u} ) {
-    $xs->get_item( $opt{u}, %opt_out );
+    if($opt{D} and ($xs->{parser}->site_type() eq 'novel')){
+        my $r = $xs->{parser}->get_index_ref($opt{u}, %opt_out);
+        print "$r->{writer},$r->{book},$r->{url},$r->{chapter_num}\n";
+    }else{
+        $xs->get_item( $opt{u}, %opt_out );
+    }
 }
 
 if ($items_ref) {
     my $select = $opt{E} ? $xs->select_item( $info, $items_ref ) : $items_ref;
     for my $r (@$select) {
         my $u = $r->{url};
-        print "\rselect : $u\n";
-        $xs->get_item( $u, %opt_out );
+        if($opt{D}){
+            my $x = $r->{writer} || $info;
+            print "$x,$r->{book},$r->{url}\n";
+        }else{
+            print "\rselect : $u\n";
+            $xs->get_item( $u, %opt_out );
+        }
     } ## end for my $r (@$select)
 }
 

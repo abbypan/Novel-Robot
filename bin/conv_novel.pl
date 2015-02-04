@@ -26,7 +26,7 @@ sub convert_novel {
     }
     print "$opt{f} => $dst_file\n";
 
-    my ($writer,$book) = $opt{f}=~/([^\\\/]+?)-(.+?)\.[^.]+$/;
+    my ($writer,$book) = $opt{f}=~/([^\\\/]+?)-([^\\\/]+?)\.[^.\\\/]+$/;
     my %conv = (
         'authors'=> $opt{w} || $writer , 
         'title'=> $opt{b} || $book , 
@@ -37,6 +37,9 @@ sub convert_novel {
 
     my $conv_str = join(" ", map { qq[--$_ "$conv{$_}"] } keys(%conv) );
     my $cmd=qq[ebook-convert "$opt{f}" "$dst_file" $conv_str]; 
+
+    $cmd.=" --mobi-keep-original-images" if($opt{t}=~/mobi$/);
     system($cmd);
+
     return $dst_file;
 }
