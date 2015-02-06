@@ -4,43 +4,52 @@
 
 =head1 NAME
 
-L<Novel::Robot> download novel /bbs thread 
+L<Novel::Robot> 
 
-小说/贴子下载器
+download novel /bbs thread 小说/贴子下载器
 
-=head2 site 支持小说站点
+=head2 site 
+
+support novel/forum website 支持小说/贴子站点
 
 L<Novel::Robot::Parser>
 
-=head2 type 支持小说输出形式
+=head2 type 
+
+support robot ouput file type, 支持小说输出形式
 
 L<Novel::Robot::Packer>
 
 =head1 get_novel.pl
 
-=head2 下载小说
+=head2 download 下载
 
-    get_novel.pl -u [小说目录页url] -t [目标文件类型] -C [是否写目录] -v [是否显示进度条] -i [章节]
+    get_novel.pl -u [url] -t [type] -i [chapter_number_list] -o [dst_file/dst_dir]
+    get_novel.pl -u [小说目录页url] -t [目标文件类型] -i [章节号] -o [目标文件名/目标文件夹]
 
     get_novel.pl -u "http://www.dddbbb.net/html/18451/index.html" -t txt
     get_novel.pl -u "http://www.jjwxc.net/onebook.php?novelid=2456" -t html
     get_novel.pl -u "http://www.jjwxc.net/onebook.php?novelid=2456" -t web -o some_dir
+
+    get_novel.pl -u "http://www.jjwxc.net/onebook.php?novelid=2456" -t jekyll -T [tag] -c [category]  -R [tagline]
     get_novel.pl -u "http://www.jjwxc.net/onebook.php?novelid=2456" -t jekyll -T [标签] -c [类别]  -R [说明]
 
-=head2 分段下载小说
+=head2 download and split novel into pieces, each piece contains $n chapters 分段下载小说
 
-    get_novel_split.pl -u [小说目录页url] -t [目标类型] -n [分段章节数] -C [是否写目录] -v [是否显示进度条]
+    get_novel.pl -u [url] -t [type] -n [split_chapter_number_step]
+    get_novel.pl -u [小说目录页url] -t [目标类型] -n [分段章节数]
 
-    get_novel_split.pl -u "http://www.jjwxc.net/onebook.php?novelid=2456" -n 10 -t jekyll
+    get_novel.pl -u "http://www.jjwxc.net/onebook.php?novelid=2456" -n 10 -t jekyll
 
-=head2 转换txt，加目录
+=head2 convert txt, parse chapter name, add toc 转换txt，加目录
 
-    get_novel.pl -w [作者] -u [书名] -f [txt文件或目录] -r [章节标题匹配的正则式] -t [目标文件类型]
-    get_novel.pl -w 顾漫 -u 何以笙箫默 -f hy1.txt -t html
-    get_novel.pl -w 顾漫 -u 何以笙箫默 -f hy1.txt,hy2.txt,dir1 -r "第[ \\t\\d]+章" -t html
+    get_novel.pl -w [writer] -b [book] -f [txt_file/directory] -r [chapter_regex] -t [type]
+    get_novel.pl -w [作者] -b [书名] -f [txt文件或目录] -r [章节标题匹配的正则式] -t [目标文件类型]
+    get_novel.pl -w 顾漫 -b 何以笙箫默 -f hy1.txt -t html
+    get_novel.pl -w 顾漫 -b 何以笙箫默 -f hy1.txt,hy2.txt,dir1 -r "第[ \\t\\d]+章" -t html
     get_novel.pl -f 天平-风起阿房.txt -t html
 
-=head2 批量下载小说
+=head2 bulk download novels/threads 批量下载小说
 
     get_novel.pl -b [board_url/writer_url] -m [select_menu_or_not] -t [packer_type]
     get_novel.pl -s [site] -q [query_type] -k [query_keyword] -m [select_menu_or_not] -t [packer_type]
@@ -48,9 +57,9 @@ L<Novel::Robot::Packer>
     get_novel.pl -b "http://www.jjwxc.net/oneauthor.php?authorid=3243" -m 1 -t html
     get_novel.pl -s jjwxc -q 作品 -k 何以笙箫默 -m 1 -t html
 
-=head2 输出小说信息（不下载）
+=head2 only print info, but not download 输出小说信息（不下载）
 
-    get_novel.pl -u [小说目录页url] -D 1
+    get_novel.pl -u [url] -D 1
     get_novel.pl -b [board_url/writer_url] -D 1
     get_novel.pl -s [site] -q [query_type] -k [query_keyword] -D 1
 
@@ -58,67 +67,77 @@ L<Novel::Robot::Packer>
     get_novel.pl -b "http://www.jjwxc.net/oneauthor.php?authorid=3243" -D 1
     get_novel.pl -s jjwxc -q 作品 -k 何以笙箫默 -D 1
 
-=head2 将小说发布到wordpress
+=head2 push novel/thread to wordpress website 将小说发布到wordpress
 
+    get_novel.pl -u [url] -c [category] -T [tag] -W [wordpress_website] -U [username] -P [password] 
     get_novel.pl -u [小说目录页url] -c [类别] -T [标签] -W [wordpress页面地址] -U [用户名] -P [密码] 
 
     get_novel.pl -u "http://www.dddbbb.net/html/18451/index.html" -c 言情 -W http://xxx.xxx.com  -U xxx -P xxx
     get_novel.pl -u "http://www.jjwxc.net/onebook.php?novelid=2456" -c 原创 -W http://xxx.xxx.com  -U xxx -P xxx
 
-    get_novel.pl -w [作者名] -u [用户名] -f [源文件] -c [类别] -T [标签] -W [wordpress页面地址] -U [用户名] -P [密码] 
-    get_novel.pl -w 顾漫 -u 何以笙箫默 -f hy.txt -c 言情 -W http://xxx.xxx.com  -U xxx -P xxx
-    get_novel.pl -w 施定柔 -u 迷行记 -f mx1.txt,mx2.txt -c 言情 -W http://xxx.xxx.com  -U xxx -P xxx
+    get_novel.pl -w [writer] -b [book] -f [txt_file/directory] -c [category] -T [tag] -W [wordpress_website] -U [username] -P [password] 
+    get_novel.pl -w [作者名] -b [用户名] -f [源文件] -c [类别] -T [标签] -W [wordpress页面地址] -U [用户名] -P [密码] 
 
+    get_novel.pl -w 顾漫 -b 何以笙箫默 -f hy.txt -c 言情 -W http://xxx.xxx.com  -U xxx -P xxx
+    get_novel.pl -w 施定柔 -b 迷行记 -f mx1.txt,mx2.txt -c 言情 -W http://xxx.xxx.com  -U xxx -P xxx
 
 
 =head2 ARG
 
-    -A : only_poster, 贴子只看楼主
+    -u : book url，小说url
+    -s : site, 指定查询的站点
+    -f : txt file / txt file dir, 指定文本文件来源(可以是单个目录或文件)
+    -w : writer url 作者专栏URL / writer name 作者名
+    -b : book name，书名
+
+    -t : save type, 小说保存类型，例如txt/html
+    -o : output filename, 保存的小说文件名
+    -q : query type, 查询的类型
+    -k : query keyword, 查询的关键字
+    -D : only print info, not download, 只输出信息，不下载，或进行其他处理操作
     -C : with_toc, 小说保存时是否生成目录(默认是)
+    -v : verbose, 显示进度条(默认显示)
+
+    -i : {min/max}_{tiezi_page/chapter_num}, 只取 x-y 章
+    -A : only_poster, 贴子只看楼主
+    -N : min_floor_word_num, 贴子每层最小字数
+    -n : split chapter num, 单个文件最大章节数(一本小说可以分多个文件，每个文件最多n章)
+
+    -r : chapter regex, 指定分割章节的正则表达式(例如："第[ \\t\\d]+章")
+    -E : select menu, 是否输出小说选择菜单
+    -p : max_process_num, 进程个数 
+    -B : forum board number, 版块序号，例如hjj的xq版块号为3
+    -R : remark, 一些补充说明
+
     -I : {min/max}_{query/board}_page, 结果列表只取 x-y 页
     -M : max_{query_item/board_item}_num, 结果列表最多取x项
-    -i : {min/max}_{tiezi_page/chapter_num}, 只取 x-y 章
     -m : max_tiezi_floor_num, 结果列表最多取x项
-    -N : min_floor_word_num, 贴子每层最小字数
-    -P : password, wordpress 密码
-    -R : remark, 一些补充说明
-    -v : verbose, 显示进度条(默认显示)
-    -T : tag，标签，例如 顾漫,小白
+
+    -S : wordpress packer 站点地址
     -U : wordpress 用户
-    -S : ...wordpress packer 站点地址
+    -P : password, wordpress 密码
+    -T : tag，标签，例如 顾漫,小白
     -c : category，小说类别，例如 原创
-    -f : ...txt file / txt file dir, 指定文本文件来源(可以是单个目录或文件)
-    -k : query keyword, 查询的关键字
-    -E : select menu, 是否输出小说选择菜单
-    -n : split chapter num, 单个文件最大章节数(一本小说可以分多个文件，每个文件最多n章)
-    -o : output filename, 保存的小说文件名
-    -p : max_process_num, 进程个数 
-    -q : query type, 查询的类型
-    -r : chapter regex, 指定分割章节的正则表达式(例如："第[ \\t\\d]+章")
-    -s : site, 指定查询的站点
-    -t : save type, 小说保存类型，例如txt/html
-    -u : ...book url，小说目录页 / book name，书名
-    -w : writer url 作者专栏URL / writer name 作者名
-    -B : 版块序号，例如hjj的xq版块号为3
-    -D : 只输出信息，不下载，或进行其他处理操作
 
 =head1 conv_novel.pl
 
-    conv_novel.pl -f [源文件] -t [目标文件类型(小写)] -w [作者] -b [书名]
-
-=head2 转换小说
+    convert novel file into epub/mobi/... use calibre's ebook-convert, default filename format is [writer]-[bookname].[type]
 
     将下载的 html格式 的小说转换成 其他格式的电子书，例如epub、mobi等等
 
     需要预先安装calibre的ebook-convert，源文件名称格式默认为 [作者-书名]
-    
+
+    conv_novel.pl -f [txt_file] -t [type] -w [writer] -b [book]
+    conv_novel.pl -f [源文件] -t [目标文件类型(小写)] -w [作者] -b [书名]
+
     conv_novel.pl -f 天平-风起阿房.html -t mobi
     conv_novel.pl -f 施定柔-迷侠记.html -t epub
 
 =head1 get_ebook.pl
 
-    简单下载电子书
+    just download and convert ebook, 简单下载电子书
 
+    get_ebook.pl [url] [type/dst_filename]
     get_ebook.pl [小说目录页url] [目标文件类型/目标文件名]
 
     get_ebook.pl "http://www.dddbbb.net/html/18451/index.html" mobi
@@ -127,17 +146,22 @@ L<Novel::Robot::Packer>
 
 =head1 send_novel.pl
 
+    send_novel.pl -f [ebook_file] -s [from_email] -d [to_email] -h [smtp_server] -u [username] -p [password]
+
     send_novel.pl -f [源文件] -s [源邮箱] -d [目标邮箱] -h [远程smtp服务器] -u [邮箱帐号] -p [邮箱密码]
 
 =head2 将小说发送到指定邮箱
 
+    need L<sendEmail|http://caspian.dotconf.net/menu/Software/SendEmail/>
+
     需要预先安装L<sendEmail|http://caspian.dotconf.net/menu/Software/SendEmail/>
 
-    本机已安装smtp服务
+    
+    local smtp service 本机已安装smtp服务
 
     send_novel.pl -f 施定柔-迷侠记.mobi -s xxx@src.com -t yyy@kindle.com
 
-    使用远程smtp服务
+    remote smtp service 使用远程smtp服务
 
     send_novel.pl -f 施定柔-迷侠记.mobi -s xxx@src.com -t yyy@kindle.com -h smtp.src.com -u  xxx -p somepwd
     send_novel.pl -f 施定柔-迷侠记.mobi -s xxx@src.com -t yyy@kindle.com -h smtp.src.com:465 -u  xxx -p somepwd
@@ -145,24 +169,32 @@ L<Novel::Robot::Packer>
 
 =head1 FUNCTION
 
-=head2 new 初始化
+=head2 new 
 
-设置解析引擎，目标文件类型
+init to set src site and dst type
+
+初始化设置解析引擎，目标文件类型
 
     my $xs = Novel::Robot->new(
     site => 'jjwxc',
     type => 'html', 
     );
 
-=head2 set_parser 设置解析引擎
+=head2 set_parser 
+
+set src site, 设置解析引擎
 
     $xs->set_parser('jjwxc');
 
-=head2 set_packer 设置打包引擎
+=head2 set_packer 
+
+set dst type, 设置打包引擎
 
     $xs->set_packer('html');
 
-=head2 get_item 下载整本小说
+=head2 get_item 
+
+download one novel/thread 下载整本小说
 
     $xs->set_parser('jjwxc');
     my $index_url = 'http://www.jjwxc.net/onebook.php?novelid=2456';
@@ -174,7 +206,9 @@ L<Novel::Robot::Packer>
             writer => '顾漫', book => '何以笙箫默', 
             );
 
-=head2 下载版块
+=head2 bulk download 
+
+bulk download writer's novel / board's threads 下载作者专栏/版块
 
     $xs->set_parser('jjwxc');
     my $writer_url = 'http://www.jjwxc.net/oneauthor.php?authorid=3243';
@@ -186,14 +220,18 @@ L<Novel::Robot::Packer>
     my ($info, $tiezis_ref) = $xs->{parser}->get_board_ref($board_url, %opt);
     $xs->get_item($_, %opt) for @$tiezis_ref;
 
-=head2  查询并下载
+=head2  query and download 
+
+查询并下载
 
     my $query_type = '作者';
     my $query_keyword='顾漫';
     my ($info, $items_ref) = $xs->{parser}->get_query_ref($query_keyword, query_type => $query_type, %opt);
     $xs->get_item($_, %opt) for @$items_ref;
 
-=head2 select_item 在Term下选择小说
+=head2 select_item 
+
+在Term下选择小说
 
     my $select_books_ref = $xs->select_item($banner_info, $books_ref);
 
