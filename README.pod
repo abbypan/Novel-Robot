@@ -22,7 +22,9 @@ L<Novel::Robot::Packer>
 
 =head1 get_novel.pl
 
-=head2 download 下载
+=head2 download 
+
+下载
 
     get_novel.pl -u [url] -t [type] -i [chapter_number_list] -o [dst_file/dst_dir]
     get_novel.pl -u [小说目录页url] -t [目标文件类型] -i [章节号] -o [目标文件名/目标文件夹]
@@ -34,14 +36,22 @@ L<Novel::Robot::Packer>
     get_novel.pl -u "http://www.jjwxc.net/onebook.php?novelid=2456" -t jekyll -T [tag] -c [category]  -R [tagline]
     get_novel.pl -u "http://www.jjwxc.net/onebook.php?novelid=2456" -t jekyll -T [标签] -c [类别]  -R [说明]
 
-=head2 download and split novel into pieces, each piece contains $n chapters 分段下载小说
+=head2 download and split 
+
+download and split novel into pieces, each piece contains $n chapters 
+
+分段下载小说
 
     get_novel.pl -u [url] -t [type] -n [split_chapter_number_step]
     get_novel.pl -u [小说目录页url] -t [目标类型] -n [分段章节数]
 
     get_novel.pl -u "http://www.jjwxc.net/onebook.php?novelid=2456" -n 10 -t jekyll
 
-=head2 convert txt, parse chapter name, add toc 转换txt，加目录
+=head2 convert txt
+
+convert txt, parse chapter name, add toc 
+
+转换txt，加目录
 
     get_novel.pl -w [writer] -b [book] -f [txt_file/directory] -r [chapter_regex] -t [type]
     get_novel.pl -w [作者] -b [书名] -f [txt文件或目录] -r [章节标题匹配的正则式] -t [目标文件类型]
@@ -49,7 +59,9 @@ L<Novel::Robot::Packer>
     get_novel.pl -w 顾漫 -b 何以笙箫默 -f hy1.txt,hy2.txt,dir1 -r "第[ \\t\\d]+章" -t html
     get_novel.pl -f 天平-风起阿房.txt -t html
 
-=head2 bulk download novels/threads 批量下载小说
+=head2 bulk download novels/threads 
+
+批量下载小说/贴子
 
     get_novel.pl -b [board_url/writer_url] -m [select_menu_or_not] -t [packer_type]
     get_novel.pl -s [site] -q [query_type] -k [query_keyword] -m [select_menu_or_not] -t [packer_type]
@@ -57,7 +69,9 @@ L<Novel::Robot::Packer>
     get_novel.pl -b "http://www.jjwxc.net/oneauthor.php?authorid=3243" -m 1 -t html
     get_novel.pl -s jjwxc -q 作品 -k 何以笙箫默 -m 1 -t html
 
-=head2 only print info, but not download 输出小说信息（不下载）
+=head2 only print info
+
+only print info, but not download 输出小说信息（不下载）
 
     get_novel.pl -u [url] -D 1
     get_novel.pl -b [board_url/writer_url] -D 1
@@ -67,7 +81,9 @@ L<Novel::Robot::Packer>
     get_novel.pl -b "http://www.jjwxc.net/oneauthor.php?authorid=3243" -D 1
     get_novel.pl -s jjwxc -q 作品 -k 何以笙箫默 -D 1
 
-=head2 push novel/thread to wordpress website 将小说发布到wordpress
+=head2 wordpress 
+
+push novel/thread to wordpress website 将小说发布到wordpress
 
     get_novel.pl -u [url] -c [category] -T [tag] -W [wordpress_website] -U [username] -P [password] 
     get_novel.pl -u [小说目录页url] -c [类别] -T [标签] -W [wordpress页面地址] -U [用户名] -P [密码] 
@@ -150,18 +166,20 @@ L<Novel::Robot::Packer>
 
     send_novel.pl -f [源文件] -s [源邮箱] -d [目标邮箱] -h [远程smtp服务器] -u [邮箱帐号] -p [邮箱密码]
 
-=head2 将小说发送到指定邮箱
+=head2 send to email
 
-    need L<sendEmail|http://caspian.dotconf.net/menu/Software/SendEmail/>
+将小说发送到指定邮箱
 
-    需要预先安装L<sendEmail|http://caspian.dotconf.net/menu/Software/SendEmail/>
+need L<sendEmail|http://caspian.dotconf.net/menu/Software/SendEmail/>
 
-    
-    local smtp service 本机已安装smtp服务
+需要预先安装L<sendEmail|http://caspian.dotconf.net/menu/Software/SendEmail/>
+
+
+local smtp service 本机已安装smtp服务
 
     send_novel.pl -f 施定柔-迷侠记.mobi -s xxx@src.com -t yyy@kindle.com
 
-    remote smtp service 使用远程smtp服务
+remote smtp service 使用远程smtp服务
 
     send_novel.pl -f 施定柔-迷侠记.mobi -s xxx@src.com -t yyy@kindle.com -h smtp.src.com -u  xxx -p somepwd
     send_novel.pl -f 施定柔-迷侠记.mobi -s xxx@src.com -t yyy@kindle.com -h smtp.src.com:465 -u  xxx -p somepwd
