@@ -15,7 +15,7 @@ binmode( STDOUT, ":encoding(console_out)" );
 binmode( STDERR, ":encoding(console_out)" );
 
 my %opt;
-getopt( 'wsqkmbfrtiCSoTcRAFNPIMnUpvuBD', \%opt );
+getopt( 'wsqkmbfrtiCSoTcRAFNPIMnUpvuBDgG', \%opt );
 
 my %opt_out = read_option(%opt);
 our $xs = Novel::Robot->new( type => $opt_out{type}, site => $opt_out{site} );
@@ -88,6 +88,8 @@ sub read_option {
         verbose  => $opt{v} // 1,
         with_toc => $opt{C} // 1,
         writer => $opt{w} ? decode( locale => $opt{w} ) : undef,
+        grep_content => $opt{g} ? decode( locale => $opt{g} ) : undef, 
+        filter_content => $opt{G} ? decode( locale => $opt{G} ) : undef,  
     );
 
     # board ->

@@ -26,8 +26,8 @@ L<Novel::Robot::Packer>
 
 下载
 
-    get_novel.pl -u [url] -t [type] -i [chapter_number_list] -o [dst_file/dst_dir]
-    get_novel.pl -u [小说目录页url] -t [目标文件类型] -i [章节号] -o [目标文件名/目标文件夹]
+    get_novel.pl -u [url] -t [type] -i [chapter_number_list] -o [dst_file/dst_dir] -g [grep_content] -G [filter_content]
+    get_novel.pl -u [小说目录页url] -t [目标文件类型] -i [章节号] -o [目标文件名/目标文件夹] -g [提取关键字] -G [过滤关键字]
 
     get_novel.pl -u "http://www.dddbbb.net/html/18451/index.html" -t txt
     get_novel.pl -u "http://www.jjwxc.net/onebook.php?novelid=2456" -t html
@@ -113,7 +113,9 @@ push novel/thread to wordpress website 将小说发布到wordpress
     -D : only print info, not download, 只输出信息，不下载，或进行其他处理操作
     -C : with_toc, 小说保存时是否生成目录(默认是)
     -v : verbose, 显示进度条(默认显示)
-
+    
+    -g : grep_content , 提取关键字
+    -G : filter_content , 过滤关键字
     -i : {min/max}_{tiezi_page/chapter_num}, 只取 x-y 章
     -A : only_poster, 贴子只看楼主
     -N : min_floor_word_num, 贴子每层最小字数
@@ -149,17 +151,6 @@ push novel/thread to wordpress website 将小说发布到wordpress
     conv_novel.pl -f 天平-风起阿房.html -t mobi
     conv_novel.pl -f 施定柔-迷侠记.html -t epub
 
-=head1 get_ebook.pl
-
-    just download and convert ebook, 简单下载电子书
-
-    get_ebook.pl [url] [type/dst_filename]
-    get_ebook.pl [小说目录页url] [目标文件类型/目标文件名]
-
-    get_ebook.pl "http://www.dddbbb.net/html/18451/index.html" mobi
-
-    get_ebook.pl "http://www.dddbbb.net/html/18451/index.html" abc.mobi
-
 =head1 send_novel.pl
 
     send_novel.pl -f [ebook_file] -s [from_email] -d [to_email] -h [smtp_server] -u [username] -p [password]
@@ -184,6 +175,27 @@ remote smtp service 使用远程smtp服务
     send_novel.pl -f 施定柔-迷侠记.mobi -s xxx@src.com -t yyy@kindle.com -h smtp.src.com -u  xxx -p somepwd
     send_novel.pl -f 施定柔-迷侠记.mobi -s xxx@src.com -t yyy@kindle.com -h smtp.src.com:465 -u  xxx -p somepwd
     send_novel.pl -f 施定柔-迷侠记.mobi -s xxx@src.com -t yyy@kindle.com -h smtp.src.com:587 -u  xxx -p somepwd
+
+=head1 get_ebook.pl
+
+    just download and convert ebook, 简单下载或处理电子书
+
+    get_ebook.pl [url/txt file/html] [type/dst_filename] [email] [get_novel_arg] [send_novel_arg]
+    get_ebook.pl [小说或贴子url/txt文件/html文件] [目标文件类型/目标文件名] [接收的email] [下载小说的补充参数] [推送小说的参数]
+
+only download novel and convert to mobi 只下载小说并转换为mobi
+
+    get_ebook.pl "http://www.dddbbb.net/html/18451/index.html" mobi
+
+only download 1-3 chapter 只下载小说的1-3章，最终输出文件名为abc.mobi
+
+    get_ebook.pl "http://www.dddbbb.net/html/18451/index.html" abc.mobi "" " -i 1-3"
+
+download novel, and send mobi to email address : xxx@kindle.cn， 下载小说并推送
+
+    get_ebook.pl "http://www.dddbbb.net/html/18451/index.html" mobi "xxx@kindle.cn" ''  '-s yyy@somesite.cn'
+
+    get_ebook.pl "http://www.dddbbb.net/html/18451/index.html" mobi "xxx@kindle.cn" '-i 1-3'  '-s yyy@somesite.cn -h smtp.src.com -u  xxx -p somepwd'
 
 =head1 FUNCTION
 
