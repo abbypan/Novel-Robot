@@ -21,7 +21,7 @@ sub main_ebook {
     #make html
     my ( $fh, $f ) = tempfile( "send_ebook-XXXXXXXXXX", TMPDIR => 1, SUFFIX => ".html" );
     make_novel_html($url, $f, $arg);
-    my ($writer, $book) = parse_writer_book($fh, $arg);
+    my ($writer, $book, $title) = parse_writer_book($fh, $arg);
 
     #conv html to ebook
     my ( $fh_e, $f_e ) = $to_email ? tempfile( "send_ebook-XXXXXXXXXX", 
@@ -34,7 +34,7 @@ sub main_ebook {
     #send ebook
     if($to_email){
         print "send ebook : $url, $type, $f_e, $to_email\n";
-        `send_novel.pl -f '$f_e' -d '$to_email' -m '$writer 《 $book 》' $email_arg`;
+        `send_novel.pl -f '$f_e' -d '$to_email' -m '$title' $email_arg`;
         unlink($f_e);
     }
 
@@ -76,5 +76,5 @@ sub parse_writer_book {
     my ($writer, $book) = $title=~m# (.+?) 《 (.+?) 》#s;
     $book.=" $arg" if($arg);
     $book=~s/[\\\/ <>\(\)\[\]]//sig;
-    return ($writer, $book); 
+    return ($writer, $book, "$title $arg"); 
 }
