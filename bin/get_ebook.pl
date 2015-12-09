@@ -21,12 +21,15 @@ sub main_ebook {
     #make html
     my ( $fh, $f ) = tempfile( "send_ebook-XXXXXXXXXX", TMPDIR => 1, SUFFIX => ".html" );
     make_novel_html($url, $f, $arg);
-    my ($writer, $book, $title) = parse_writer_book($fh, $arg);
+
+    my ($writer, $book) = parse_writer_book($url, $fh, $arg);
+
+    my $write_f = $type=~/[\\\/]/ ? $type : "$writer-$book.$type";
 
     #conv html to ebook
     my ( $fh_e, $f_e ) = $to_email ? tempfile( "send_ebook-XXXXXXXXXX", 
         TMPDIR => 1, 
-        SUFFIX => ".$type" ) : ('', "$writer-$book.$type");
+        SUFFIX => ".$type" ) : ('', $write_f);
     my $conv_cmd = encode(locale => qq[conv_novel.pl -f '$f' -t '$f_e' -w '$writer' -b '$book']);
     print encode(locale=>"conv to mobi $f_e\n");
     `$conv_cmd`;
@@ -34,7 +37,7 @@ sub main_ebook {
     #send ebook
     if($to_email){
         print "send ebook : $url, $type, $f_e, $to_email\n";
-        `send_novel.pl -f '$f_e' -d '$to_email' -m '$title' $email_arg`;
+        `send_novel.pl -f '$f_e' -d '$to_email' -m '$writer $book' $email_arg`;
         unlink($f_e);
     }
 
@@ -45,7 +48,7 @@ sub make_novel_html {
     my ($url, $f, $arg) = @_;
 
     my $cmd;
-    if(-f $url and $url=~/\.html/){
+    if(-f $url and $url=~/\.html/i){
         copy($url, $f);
     }elsif(-f $url){
         print "convert txt\n";
@@ -66,15 +69,24 @@ sub make_novel_html {
 }
 
 sub parse_writer_book {
-    my ($fh, $arg) = @_;
-    my $title;
-    while(<$fh>){
-        ($title) = m#<title>(.+?)</title>#;
-        last if($title);
+    my ($url, $fh, $arg) = @_;
+    my $writer;
+    my $book;
+
+    if(-f $url and $url=~/\.html/i){
+        my $u = decode(locale => $url);
+        ($writer, $book) = $u=~/([^\\\/]+?)-([^\\\/]+)\.html/i;
+    }else{
+        my $title='';
+        while(<$fh>){
+            ($title) = m#<title>(.+?)</title>#;
+            last if($title);
+        }
+        $title=decode("utf8", $title);
+        ($writer, $book) = $title=~m# (.+?) 《 (.+?) 》#s;
     }
-    $title=decode("utf8", $title);
-    my ($writer, $book) = $title=~m# (.+?) 《 (.+?) 》#s;
+
     $book.=" $arg" if($arg);
     $book=~s/[\\\/ <>\(\)\[\]]//sig;
-    return ($writer, $book, "$title $arg"); 
+    return ($writer, $book); 
 }
