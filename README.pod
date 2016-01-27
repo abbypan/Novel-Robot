@@ -151,30 +151,6 @@ push novel/thread to wordpress website 将小说发布到wordpress
     conv_novel.pl -f 天平-风起阿房.html -t mobi
     conv_novel.pl -f 施定柔-迷侠记.html -t epub
 
-=head1 send_novel.pl
-
-    send_novel.pl -f [ebook_file] -s [from_email] -d [to_email] -h [smtp_server] -u [username] -p [password]
-
-    send_novel.pl -f [源文件] -s [源邮箱] -d [目标邮箱] -h [远程smtp服务器] -u [邮箱帐号] -p [邮箱密码]
-
-=head2 send to email
-
-将小说发送到指定邮箱
-
-need L<sendEmail|http://caspian.dotconf.net/menu/Software/SendEmail/>
-
-需要预先安装L<sendEmail|http://caspian.dotconf.net/menu/Software/SendEmail/>
-
-
-local smtp service 本机已安装smtp服务
-
-    send_novel.pl -f 施定柔-迷侠记.mobi -s xxx@src.com -t yyy@kindle.com
-
-remote smtp service 使用远程smtp服务
-
-    send_novel.pl -f 施定柔-迷侠记.mobi -s xxx@src.com -t yyy@kindle.com -h smtp.src.com -u  xxx -p somepwd
-    send_novel.pl -f 施定柔-迷侠记.mobi -s xxx@src.com -t yyy@kindle.com -h smtp.src.com:465 -u  xxx -p somepwd
-    send_novel.pl -f 施定柔-迷侠记.mobi -s xxx@src.com -t yyy@kindle.com -h smtp.src.com:587 -u  xxx -p somepwd
 
 =head1 get_ebook.pl
 
@@ -191,11 +167,19 @@ only download 1-3 chapter 只下载小说的1-3章，最终输出文件名为abc
 
     get_ebook.pl "http://www.dddbbb.net/html/18451/index.html" abc.mobi "" " -i 1-3"
 
-download novel, and send mobi to email address : xxx@kindle.cn， 下载小说并推送
+=head2 send novel
 
-    get_ebook.pl "http://www.dddbbb.net/html/18451/index.html" mobi "xxx@kindle.cn" ''  '-s yyy@somesite.cn'
+download novel, and send mobi to email address : xxx@kindle.cn， 下载小说并推送到指定邮箱
 
-    get_ebook.pl "http://www.dddbbb.net/html/18451/index.html" mobi "xxx@kindle.cn" '-i 1-3'  '-s yyy@somesite.cn -h smtp.src.com -u  xxx -p somepwd'
+need L<sendEmail|http://caspian.dotconf.net/menu/Software/SendEmail/>，需要预先安装L<sendEmail|http://caspian.dotconf.net/menu/Software/SendEmail/>
+
+local smtp service 本机已安装smtp服务
+
+    get_ebook.pl "http://www.dddbbb.net/html/18451/index.html" mobi "xxx@kindle.cn" ''  '-f yyy@somesite.cn'
+
+remote smtp service 使用远程smtp服务
+
+    get_ebook.pl "http://www.dddbbb.net/html/18451/index.html" mobi "xxx@kindle.cn" '-i 1-3'  '-f yyy@somesite.cn -s smtp.src.com -xu xxx -xp somepwd'
 
 =head1 FUNCTION
 

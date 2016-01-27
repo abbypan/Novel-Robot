@@ -37,7 +37,8 @@ sub main_ebook {
     #send ebook
     if($to_email){
         print "send ebook : $url, $type, $f_e, $to_email\n";
-        `send_novel.pl -f '$f_e' -d '$to_email' -m '$writer $book' $email_arg`;
+        #`send_novel.pl -f '$f_e' -d '$to_email' -m '$writer $book' '$email_arg'`;
+        system(qq[sendEmail -u '$writer $book' -m '$writer $book' -a '$f_e' -t '$to_email' $email_arg]);
         unlink($f_e);
     }
 
@@ -50,6 +51,9 @@ sub make_novel_html {
     my $cmd;
     if(-f $url and $url=~/\.html/i){
         copy($url, $f);
+    }elsif(-f $url and $url=~/\.raw/i){
+        print "convert raw\n";
+        $cmd=qq[get_novel.pl -u "$url" -o "$f" -s raw -t html];
     }elsif(-f $url){
         print "convert txt\n";
         my $u = decode(locale => $url);

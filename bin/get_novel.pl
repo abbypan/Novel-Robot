@@ -71,7 +71,7 @@ sub read_option {
         ? [ split ',', decode( locale => $opt{c} ) ]
         : undef,
         chapter_regex => $opt{r} ? decode( locale => $opt{r} ) : undef,
-        max_process_num => $opt{p} // 3,
+        max_process_num => $opt{p} // 1,
         only_poster     => $opt{A},
         output          => $opt{o},
         packer_url      => $opt{S},

@@ -12,7 +12,7 @@ use Parallel::ForkManager;
 use Novel::Robot::Parser;
 use Novel::Robot::Packer;
 
-our $VERSION = 0.35;
+our $VERSION = 0.36;
 
 sub new {
     my ( $self, %opt ) = @_;
@@ -29,13 +29,15 @@ sub new {
 sub set_parser {
     my ( $self, $site ) = @_;
     $self->{site} = $self->{parser}->detect_site($site);
-    bless $self->{parser}, "Novel::Robot::Parser::$self->{site}";
+    $self->{parser}  = Novel::Robot::Parser->new(%$self);
+    return $self;
 } ## end sub set_parser
 
 sub set_packer {
     my ( $self, $type ) = @_;
     $self->{type} = $type;
-    bless $self->{packer}, "Novel::Robot::Packer::$self->{type}";
+    $self->{packer}  = Novel::Robot::Packer->new(%$self);
+    return $self;
 } ## end sub set_packer
 
 sub get_item {
