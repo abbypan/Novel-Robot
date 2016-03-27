@@ -81,38 +81,21 @@ only print info, but not download 输出小说信息（不下载）
     get_novel.pl -b "http://www.jjwxc.net/oneauthor.php?authorid=3243" -D 1
     get_novel.pl -s jjwxc -q 作品 -k 何以笙箫默 -D 1
 
-=head2 wordpress 
-
-push novel/thread to wordpress website 将小说发布到wordpress
-
-    get_novel.pl -u [url] -c [category] -T [tag] -W [wordpress_website] -U [username] -P [password] 
-    get_novel.pl -u [小说目录页url] -c [类别] -T [标签] -W [wordpress页面地址] -U [用户名] -P [密码] 
-
-    get_novel.pl -u "http://www.dddbbb.net/html/18451/index.html" -c 言情 -W http://xxx.xxx.com  -U xxx -P xxx
-    get_novel.pl -u "http://www.jjwxc.net/onebook.php?novelid=2456" -c 原创 -W http://xxx.xxx.com  -U xxx -P xxx
-
-    get_novel.pl -w [writer] -b [book] -f [txt_file/directory] -c [category] -T [tag] -W [wordpress_website] -U [username] -P [password] 
-    get_novel.pl -w [作者名] -b [用户名] -f [源文件] -c [类别] -T [标签] -W [wordpress页面地址] -U [用户名] -P [密码] 
-
-    get_novel.pl -w 顾漫 -b 何以笙箫默 -f hy.txt -c 言情 -W http://xxx.xxx.com  -U xxx -P xxx
-    get_novel.pl -w 施定柔 -b 迷行记 -f mx1.txt,mx2.txt -c 言情 -W http://xxx.xxx.com  -U xxx -P xxx
-
-
 =head2 ARG
 
-    -u : book url，小说url
     -s : site, 指定查询的站点
-    -f : txt file / txt file dir, 指定文本文件来源(可以是单个目录或文件)
+
+    -u : book url，小说url
     -w : writer url 作者专栏URL / writer name 作者名
     -b : book name，书名
+    -f : txt file / txt file dir, 指定文本文件来源(可以是单个目录或文件)
+    -q : query type, 查询的类型
+    -k : query keyword, 查询的关键字
 
     -t : save type, 小说保存类型，例如txt/html
     -o : output filename, 保存的小说文件名
-    -q : query type, 查询的类型
-    -k : query keyword, 查询的关键字
     -D : only print info, not download, 只输出信息，不下载，或进行其他处理操作
     -C : with_toc, 小说保存时是否生成目录(默认是)
-    -v : verbose, 显示进度条(默认显示)
     
     -g : grep_content , 提取关键字
     -G : filter_content , 过滤关键字
@@ -123,19 +106,14 @@ push novel/thread to wordpress website 将小说发布到wordpress
 
     -r : chapter regex, 指定分割章节的正则表达式(例如："第[ \\t\\d]+章")
     -E : select menu, 是否输出小说选择菜单
-    -p : max_process_num, 进程个数 
     -B : forum board number, 版块序号，例如hjj的xq版块号为3
-    -R : remark, 一些补充说明
 
     -I : {min/max}_{query/board}_page, 结果列表只取 x-y 页
     -M : max_{query_item/board_item}_num, 结果列表最多取x项
     -m : max_tiezi_floor_num, 结果列表最多取x项
 
-    -S : wordpress packer 站点地址
-    -U : wordpress 用户
-    -P : password, wordpress 密码
-    -T : tag，标签，例如 顾漫,小白
-    -c : category，小说类别，例如 原创
+    -v : verbose, 显示进度条(默认显示)
+    -p : max_process_num, 进程个数 
 
 =head1 conv_novel.pl
 
@@ -152,34 +130,52 @@ push novel/thread to wordpress website 将小说发布到wordpress
     conv_novel.pl -f 施定柔-迷侠记.html -t epub
 
 
-=head1 get_ebook.pl
+=head1 run_novel.pl
+
+=head2 download and convert novel
 
     just download and convert ebook, 简单下载或处理电子书
 
-    get_ebook.pl [url/txt file/html] [type/dst_filename] [email] [get_novel_arg] [send_novel_arg]
-    get_ebook.pl [小说或贴子url/txt文件/html文件] [目标文件类型/目标文件名] [接收的email] [下载小说的补充参数] [推送小说的参数]
+only download novel and convert to ebook 只下载小说并转换为电子书
 
-only download novel and convert to mobi 只下载小说并转换为mobi
-
-    get_ebook.pl "http://www.dddbbb.net/html/18451/index.html" mobi
+    run_novel.pl -u "http://www.dddbbb.net/html/18451/index.html" -T mobi
+    run_novel.pl -u "http://www.dddbbb.net/html/18451/index.html" -o mytest.epub
 
 only download 1-3 chapter 只下载小说的1-3章，最终输出文件名为abc.mobi
 
-    get_ebook.pl "http://www.dddbbb.net/html/18451/index.html" abc.mobi "" " -i 1-3"
+    run_novel.pl -u "http://www.dddbbb.net/html/18451/index.html" -o abc.mobi -G "-i 1-3"
 
-=head2 send novel
-
-download novel, and send mobi to email address : xxx@kindle.cn， 下载小说并推送到指定邮箱
+=head2 send novel with email
 
 need L<sendEmail|http://caspian.dotconf.net/menu/Software/SendEmail/>，需要预先安装L<sendEmail|http://caspian.dotconf.net/menu/Software/SendEmail/>
 
+download novel, and send mobi to email address : xxx@kindle.cn， 下载小说并推送到指定邮箱
+
 local smtp service 本机已安装smtp服务
 
-    get_ebook.pl "http://www.dddbbb.net/html/18451/index.html" mobi "xxx@kindle.cn" ''  '-f yyy@somesite.cn'
+    run_novel.pl -u "http://www.dddbbb.net/html/18451/index.html" -T mobi -t "xxx@kindle.cn" -S "-f yyy@somesite.cn"
 
 remote smtp service 使用远程smtp服务
 
-    get_ebook.pl "http://www.dddbbb.net/html/18451/index.html" mobi "xxx@kindle.cn" '-i 1-3'  '-f yyy@somesite.cn -s smtp.src.com -xu xxx -xp somepwd'
+    run_novel.pl -u "http://www.dddbbb.net/html/18451/index.html" -T mobi -t "xxx@kindle.cn" -G "-i 1-3"  -S "-f yyy@somesite.cn -s smtp.src.com -xu xxx -xp somepwd"
+
+use ansible，push ebook to remote host, and then sendEmail
+
+    run_novel.pl -h remote.vps.com -u "http://www.dddbbb.net/html/18451/index.html" -T mobi -t "xxx@kindle.cn" -S "-f yyy@somesite.cn"
+
+=head2 ARG
+
+    -u : book url，小说url
+    -t : send to email address，推送的邮箱地址
+
+    -o : output filename，输出电子书文件名
+    -T : ebook type，电子书类型
+
+    -G : get_novel.pl args
+    -C : conv_novel.pl args
+    -S : sendEmail args
+
+    -h : remote host,远程调用的机器名
 
 =head1 FUNCTION
 

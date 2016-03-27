@@ -15,7 +15,7 @@ binmode( STDOUT, ":encoding(console_out)" );
 binmode( STDERR, ":encoding(console_out)" );
 
 my %opt;
-getopt( 'wsqkmbfrtiCSoTcRAFNPIMnUpvuBDgG', \%opt );
+getopt( 'usfwbtoqkDCvgGiANnrEpBIMm', \%opt );
 
 my %opt_out = read_option(%opt);
 our $xs = Novel::Robot->new( type => $opt_out{type}, site => $opt_out{site} );
@@ -67,24 +67,16 @@ sub read_option {
     my %opt_out = (
         board    => $opt{B},
         book     => $opt{u} ? decode( locale => $opt{u} ) : undef,
-        category => $opt{c}
-        ? [ split ',', decode( locale => $opt{c} ) ]
-        : undef,
         chapter_regex => $opt{r} ? decode( locale => $opt{r} ) : undef,
         max_process_num => $opt{p} // 1,
         only_poster     => $opt{A},
         output          => $opt{o},
-        packer_url      => $opt{S},
-        passwd          => $opt{P},
         query_keyword => $opt{k} ? decode( locale => $opt{k} ) : undef,
         query_type    => $opt{q} ? decode( locale => $opt{q} ) : undef,
-        remark        => $opt{R} ? decode( locale => $opt{R} ) : undef,
         select_menu   => $opt{E},
         site => $opt{s} || $opt{u} || $opt{b},
         step_chapter_num => $opt{n},
-        tag => $opt{T} ? [ split ',', decode( locale => $opt{T} ) ] : undef,
         type => $opt{t} || 'html',
-        usr => $opt{U},
         verbose  => $opt{v} // 1,
         with_toc => $opt{C} // 1,
         writer => $opt{w} ? decode( locale => $opt{w} ) : undef,
