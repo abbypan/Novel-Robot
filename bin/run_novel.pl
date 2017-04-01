@@ -18,7 +18,14 @@ binmode( STDERR, ":encoding(console_out)" );
 
 my %opt;
 getopt( 'fwbutTGCSoh', \%opt );
-$opt{T} ||= 'mobi' unless ( exists $opt{o} );
+
+if($opt{o} and $opt{o}=~m#[^\/\\]+\.[^\/\\]+$#){
+    my ($t) = $opt{o}=~m#[^\/\\]+\.([^\/\\]+)$#;
+    $opt{T} ||= $t;
+}else{
+    $opt{T} ||= 'mobi';
+}
+
 for ( qw/G C S o/ ) {
   $opt{$_} = exists $opt{$_} ? decode( locale => $opt{$_} ) : '';
 }
@@ -68,7 +75,9 @@ sub get_ebook {
     system( encode( locale => qq[get_novel.pl -u "$src" -o $html_f] ) );
   }
 
-  my $ebook_f = $o{o} || "$writer-$book.$o{T}";
+  $o{o}=~s#/?$##;
+  my $ebook_f = ($o{o} and -d $o{o}) ? "$o{o}/$writer-$book.$o{T}" : 
+                $o{o} ? $o{o} : "$writer-$book.$o{T}";
   my ( $type ) = $ebook_f =~ /\.([^.]+)$/;
 
   #conv html to ebook
@@ -79,7 +88,7 @@ sub get_ebook {
     SUFFIX => ".$type"
     )
     : ( '', $ebook_f );
-  print encode( locale => "conv to ebook $f_e\n" );
+  print "conv to ebook $f_e\n";
   if ( $type ne 'html' ) {
     system( encode( locale => qq[conv_novel.pl -f "$html_f" -t "$f_e" -w "$writer" -b "$book" $o{C}] ) );
     unlink( $html_f );
