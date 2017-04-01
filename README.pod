@@ -22,65 +22,6 @@ L<Novel::Robot::Packer>
 
 =head1 get_novel.pl
 
-=head2 download 
-
-下载
-
-    get_novel.pl -u [url] -t [type] -i [chapter_number_list] -o [dst_file/dst_dir] -g [grep_content] -G [filter_content]
-    get_novel.pl -u [小说目录页url] -t [目标文件类型] -i [章节号] -o [目标文件名/目标文件夹] -g [提取关键字] -G [过滤关键字]
-
-    get_novel.pl -u "http://www.dddbbb.net/html/18451/index.html" -t txt
-    get_novel.pl -u "http://www.jjwxc.net/onebook.php?novelid=2456" -t html
-    get_novel.pl -u "http://www.jjwxc.net/onebook.php?novelid=2456" -t web -o some_dir
-
-    get_novel.pl -u "http://www.jjwxc.net/onebook.php?novelid=2456" -t jekyll -T [tag] -c [category]  -R [tagline]
-    get_novel.pl -u "http://www.jjwxc.net/onebook.php?novelid=2456" -t jekyll -T [标签] -c [类别]  -R [说明]
-
-=head2 download and split 
-
-download and split novel into pieces, each piece contains $n chapters 
-
-分段下载小说
-
-    get_novel.pl -u [url] -t [type] -n [split_chapter_number_step]
-    get_novel.pl -u [小说目录页url] -t [目标类型] -n [分段章节数]
-
-    get_novel.pl -u "http://www.jjwxc.net/onebook.php?novelid=2456" -n 10 -t jekyll
-
-=head2 convert txt
-
-convert txt, parse chapter name, add toc 
-
-转换txt，加目录
-
-    get_novel.pl -w [writer] -b [book] -f [txt_file/directory] -r [chapter_regex] -t [type]
-    get_novel.pl -w [作者] -b [书名] -f [txt文件或目录] -r [章节标题匹配的正则式] -t [目标文件类型]
-    get_novel.pl -w 顾漫 -b 何以笙箫默 -f hy1.txt -t html
-    get_novel.pl -w 顾漫 -b 何以笙箫默 -f hy1.txt,hy2.txt,dir1 -r "第[ \\t\\d]+章" -t html
-    get_novel.pl -f 天平-风起阿房.txt -t html
-
-=head2 bulk download novels/threads 
-
-批量下载小说/贴子
-
-    get_novel.pl -b [board_url/writer_url] -m [select_menu_or_not] -t [packer_type]
-    get_novel.pl -s [site] -q [query_type] -k [query_keyword] -m [select_menu_or_not] -t [packer_type]
-
-    get_novel.pl -b "http://www.jjwxc.net/oneauthor.php?authorid=3243" -m 1 -t html
-    get_novel.pl -s jjwxc -q 作品 -k 何以笙箫默 -m 1 -t html
-
-=head2 only print info
-
-only print info, but not download 输出小说信息（不下载）
-
-    get_novel.pl -u [url] -D 1
-    get_novel.pl -b [board_url/writer_url] -D 1
-    get_novel.pl -s [site] -q [query_type] -k [query_keyword] -D 1
-
-    get_novel.pl -u "http://www.jjwxc.net/onebook.php?novelid=2456"  -D 1
-    get_novel.pl -b "http://www.jjwxc.net/oneauthor.php?authorid=3243" -D 1
-    get_novel.pl -s jjwxc -q 作品 -k 何以笙箫默 -D 1
-
 =head2 ARG
 
     -s : site, 指定查询的站点
@@ -115,6 +56,63 @@ only print info, but not download 输出小说信息（不下载）
     -v : verbose, 显示进度条(默认显示)
     -p : max_process_num, 进程个数 
 
+=head2 download 
+
+下载
+
+    get_novel.pl -u [url] -t [type] -i [chapter_number_list] -o [dst_file/dst_dir] -g [grep_content] -G [filter_content]
+    get_novel.pl -u [小说目录页url] -t [目标文件类型] -i [章节号] -o [目标文件名/目标文件夹] -g [提取关键字] -G [过滤关键字]
+
+    get_novel.pl -u "http://www.jjwxc.net/onebook.php?novelid=14838" -t txt
+    get_novel.pl -u "http://www.jjwxc.net/onebook.php?novelid=14838" -t html
+    get_novel.pl -u "http://www.jjwxc.net/onebook.php?novelid=14838" -t web -o some_dir
+
+=head2 download and split 
+
+download and split novel into pieces, each piece contains $n chapters 
+
+分段下载小说
+
+    get_novel.pl -u [url] -t [type] -n [split_chapter_number_step]
+    get_novel.pl -u [小说目录页url] -t [目标类型] -n [分段章节数]
+
+    get_novel.pl -u "http://www.jjwxc.net/onebook.php?novelid=14838" -n 10 -t txt
+
+=head2 convert txt
+
+convert txt, parse chapter name, add toc 
+
+转换txt，加目录
+
+    get_novel.pl -w [writer] -b [book] -f [txt_file/directory] -r [chapter_regex] -t [type]
+    get_novel.pl -w [作者] -b [书名] -f [txt文件或目录] -r [章节标题匹配的正则式] -t [目标文件类型]
+    get_novel.pl -w 牵机 -b 断情逐妖记 -f dq1.txt -t html
+    get_novel.pl -w 牵机 -b 断情逐妖记 -f dq1.txt,dq2.txt,dir1 -r "第[ \\t\\d]+章" -t html
+    get_novel.pl -f 飘灯-像妖怪一样自由.txt -t html
+
+=head2 bulk download novels/threads 
+
+批量下载小说/贴子
+
+    get_novel.pl -b [board_url/writer_url] -m [select_menu_or_not] -t [packer_type]
+    get_novel.pl -s [site] -q [query_type] -k [query_keyword] -m [select_menu_or_not] -t [packer_type]
+
+    get_novel.pl -b "http://www.jjwxc.net/oneauthor.php?authorid=14644" -m 1 -t html
+    get_novel.pl -s jjwxc -q 作品 -k 断情逐妖记 -m 1 -t html
+
+=head2 only print info
+
+only print info, but not download 输出小说信息（不下载）
+
+    get_novel.pl -u [url] -D 1
+    get_novel.pl -b [board_url/writer_url] -D 1
+    get_novel.pl -s [site] -q [query_type] -k [query_keyword] -D 1
+
+    get_novel.pl -u "http://www.jjwxc.net/onebook.php?novelid=14838"  -D 1
+    get_novel.pl -b "http://www.jjwxc.net/oneauthor.php?authorid=14644" -D 1
+    get_novel.pl -s jjwxc -q 作品 -k 断情逐妖记 -D 1
+
+
 =head1 conv_novel.pl
 
     convert novel file into epub/mobi/... use calibre's ebook-convert, default filename format is [writer]-[bookname].[type]
@@ -132,41 +130,14 @@ only print info, but not download 输出小说信息（不下载）
 
 =head1 run_novel.pl
 
-=head2 download and convert novel
-
-    just download and convert ebook, 简单下载或处理电子书
-
-only download novel and convert to ebook 只下载小说并转换为电子书
-
-    run_novel.pl -u "http://www.dddbbb.net/html/18451/index.html" -T mobi
-    run_novel.pl -u "http://www.dddbbb.net/html/18451/index.html" -o mytest.epub
-
-only download 1-3 chapter 只下载小说的1-3章，最终输出文件名为abc.mobi
-
-    run_novel.pl -u "http://www.dddbbb.net/html/18451/index.html" -o abc.mobi -G "-i 1-3"
-
-=head2 send novel with email
-
-need L<sendEmail|http://caspian.dotconf.net/menu/Software/SendEmail/>，需要预先安装L<sendEmail|http://caspian.dotconf.net/menu/Software/SendEmail/>
-
-download novel, and send mobi to email address : xxx@kindle.cn， 下载小说并推送到指定邮箱
-
-local smtp service 本机已安装smtp服务
-
-    run_novel.pl -u "http://www.dddbbb.net/html/18451/index.html" -T mobi -t "xxx@kindle.cn" -S "-f yyy@somesite.cn"
-
-remote smtp service 使用远程smtp服务
-
-    run_novel.pl -u "http://www.dddbbb.net/html/18451/index.html" -T mobi -t "xxx@kindle.cn" -G "-i 1-3"  -S "-f yyy@somesite.cn -s smtp.src.com -xu xxx -xp somepwd"
-
-use ansible，push ebook to remote host, and then sendEmail
-
-    run_novel.pl -h remote.vps.com -u "http://www.dddbbb.net/html/18451/index.html" -T mobi -t "xxx@kindle.cn" -S "-f yyy@somesite.cn"
-
 =head2 ARG
 
     -u : book url，小说url
-    -t : send to email address，推送的邮箱地址
+    -w : writer name, 作者
+    -b : book name，书名
+    -f : txt file, txt文件或目录
+
+    -t : send to email address，推送的目标邮箱地址
 
     -o : output filename，输出电子书文件名
     -T : ebook type，电子书类型
@@ -176,6 +147,47 @@ use ansible，push ebook to remote host, and then sendEmail
     -S : sendEmail args
 
     -h : remote host,远程调用的机器名
+
+=head2 download url and convert
+
+    just download and convert ebook, 简单下载或处理电子书
+
+only download novel and convert to ebook 只下载小说并转换为电子书
+
+    run_novel.pl -u "http://www.jjwxc.net/onebook.php?novelid=14838" -T mobi
+    run_novel.pl -u "http://www.jjwxc.net/onebook.php?novelid=14838" -o mytest.epub
+
+only download 1-3 chapter 只下载小说的1-3章，最终输出文件名为abc.mobi
+
+    run_novel.pl -u "http://www.jjwxc.net/onebook.php?novelid=14838" -o abc.mobi -G "-i 1-3"
+
+=head2 deal txt and convert
+
+    run_novel.pl -f 飘灯-风尘叹.txt -T mobi
+    run_novel.pl -f fct.txt -w 飘灯 -b 风尘叹 -T mobi
+
+=head2 send novel with email
+
+need L<sendEmail|http://caspian.dotconf.net/menu/Software/SendEmail/>，需要预先安装L<sendEmail|http://caspian.dotconf.net/menu/Software/SendEmail/>
+
+download/convert novel, and send mobi to email address : xxx@kindle.cn， 下载小说并推送到指定邮箱
+
+local smtp service 本地已安装smtp服务
+
+    run_novel.pl -u "http://www.jjwxc.net/onebook.php?novelid=14838" -T mobi -t "xxx@kindle.cn" -S "-f yyy@somesite.cn"
+    run_novel.pl -f fct.txt -w 飘灯 -b 风尘叹 -T mobi -t "xxx@kindle.cn" -S "-f yyy@somesite.cn"
+
+remote smtp service 使用远程smtp服务
+
+    run_novel.pl -u "http://www.jjwxc.net/onebook.php?novelid=14838" -T mobi -t "xxx@kindle.cn" -G "-i 1-3"  -S "-f yyy@somesite.cn -s smtp.src.com -xu xxx -xp somepwd"
+    run_novel.pl -u "http://www.jjwxc.net/onebook.php?novelid=14838" -T mobi -t "xxx@kindle.cn" -S "-f yyy@qq.com -s smtp.qq.com:587 -o tls=yes -xu yyy -xp 'aaaaaaaaaaaaagga'"
+    run_novel.pl -f fct.txt -w 飘灯 -b 风尘叹 -T mobi -t "xxx@kindle.cn" -S "-f yyy@somesite.cn -s smtp.src.com -xu xxx -xp somepwd"
+    run_novel.pl -f fct.txt -w 飘灯 -b 风尘叹 -T mobi -T mobi -t "xxx@kindle.cn" -S "-f yyy@qq.com -s smtp.qq.com:587 -o tls=yes -xu yyy -xp 'aaaaaaaaaaaaagga'"
+
+use ansible，push ebook to remote host, and then sendEmail 使用ansible把电子书上传到远程服务器，再在远程服务器调用其本机smtp推送
+
+    run_novel.pl -h remote.vps.com -u "http://www.jjwxc.net/onebook.php?novelid=14838" -T mobi -t "xxx@kindle.cn" -S "-f yyy@somesite.cn"
+    run_novel.pl -h remote.vps.com -f fct.txt -w 飘灯 -b 风尘叹 -T mobi -t "xxx@kindle.cn" -S "-f yyy@somesite.cn"
 
 =head1 FUNCTION
 
@@ -213,7 +225,7 @@ download one novel/thread 下载整本小说
 
     $xs->set_parser('txt');
     $xs->get_item([ '/somepath/somefile.txt' ]
-            writer => '顾漫', book => '何以笙箫默', 
+            writer => '牵机', book => '断情逐妖记', 
             );
 
 =head2 bulk download 
@@ -221,7 +233,7 @@ download one novel/thread 下载整本小说
 bulk download writer's novel / board's threads 下载作者专栏/版块
 
     $xs->set_parser('jjwxc');
-    my $writer_url = 'http://www.jjwxc.net/oneauthor.php?authorid=3243';
+    my $writer_url = 'http://www.jjwxc.net/oneauthor.php?authorid=14644';
     my ($writer_name, $books_ref) = $xs->{parser}->get_board_ref($writer_url, %opt);
     $xs->get_item($_, %opt) for @$books_ref;
 
@@ -235,7 +247,7 @@ bulk download writer's novel / board's threads 下载作者专栏/版块
 查询并下载
 
     my $query_type = '作者';
-    my $query_keyword='顾漫';
+    my $query_keyword='牵机';
     my ($info, $items_ref) = $xs->{parser}->get_query_ref($query_keyword, query_type => $query_type, %opt);
     $xs->get_item($_, %opt) for @$items_ref;
 

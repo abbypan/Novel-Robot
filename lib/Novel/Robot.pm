@@ -12,7 +12,7 @@ use Parallel::ForkManager;
 use Novel::Robot::Parser;
 use Novel::Robot::Packer;
 
-our $VERSION = 0.36;
+our $VERSION = 0.37;
 
 sub new {
     my ( $self, %opt ) = @_;
@@ -81,21 +81,5 @@ sub select_item {
     return \@select_results;
 } ## end sub select_item
 
-sub split_id_list {
-
-    #id_list_str : 1,3,9-11
-    my ( $self, $id_list_str ) = @_;
-
-    my @id_list = split ',', $id_list_str;
-
-    my @chap_ids;
-    for my $i (@id_list) {
-        my ( $s, $e ) = split '-', $i;
-        $e ||= $s;
-        push @chap_ids, ( $s .. $e );
-    }
-
-    return \@chap_ids;
-}
 
 1;

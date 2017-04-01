@@ -19,7 +19,7 @@ getopt( 'usfwbtoqkDCvgGiANnrEpBIMm', \%opt );
 
 my %opt_out = read_option(%opt);
 our $xs = Novel::Robot->new( type => $opt_out{type}, site => $opt_out{site} );
-$opt_out{chapter_ids} = $xs->split_id_list( $opt{i} )  if($opt{i});
+
 
 my $info;
 my $items_ref;
@@ -88,7 +88,7 @@ sub read_option {
     my ( $class, $item ) = $opt{b} ? qw/board item/ : qw/query item/;
     if ( $opt{I} ) {
         ( $opt_out{"min_${class}_page"}, $opt_out{"max_${class}_page"} ) =
-          split '-', $opt{I};
+          split_index($opt{I});
     }
 
     if ( $opt{M} ) {
@@ -97,8 +97,8 @@ sub read_option {
 
     # tiezi ->
     if ( $opt{i} ) {
-        @opt_out{qw/min_tiezi_page max_tiezi_page/}   = split '-', $opt{i};
-        @opt_out{qw/min_chapter_num max_chapter_num/} = split '-', $opt{i};
+        @opt_out{qw/min_tiezi_page max_tiezi_page/}   = split_index($opt{i});
+        @opt_out{qw/min_chapter_num max_chapter_num/} = split_index($opt{i});
     }
 
     $opt_out{max_tiezi_floor_num} = $opt{m};
@@ -142,4 +142,14 @@ sub get_novel_split {
             title           => sprintf( "%s 《%s》 %0${en}d", @info_list ),
         );
     }
+}
+
+sub split_index {
+    my ($s) = @_;
+    return ($s, $s) if($s=~/^\d+$/);
+    if($s=~/^\d*-\d*$/){
+        my ($min, $max) = split '-', $s;
+        return ($min, $max);
+    }
+    return;
 }
