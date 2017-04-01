@@ -70,9 +70,9 @@ sub get_ebook {
   my ( $fh, $html_f ) = tempfile( "run_novel-html-XXXXXXXXXXXXXX", TMPDIR => 1, SUFFIX => ".html" );
   if ( -f $src ) {
     my $s = decode( locale => $src );
-    system( encode( locale => qq[get_novel.pl -f "$s" -w "$writer" -b "$book" -o $html_f] ) );
+    system( encode( locale => qq[get_novel.pl -f "$s" -w "$writer" -b "$book" -o $html_f $o{G}] ) );
   } else {
-    system( encode( locale => qq[get_novel.pl -u "$src" -o $html_f] ) );
+    system( encode( locale => qq[get_novel.pl -u "$src" -o $html_f $o{G}] ) );
   }
 
   $o{o}=~s#/?$##;
