@@ -20,6 +20,68 @@ support robot ouput file type, 支持小说输出形式
 
 L<Novel::Robot::Packer>
 
+=head1 run_novel.pl
+
+=head2 ARG
+
+    -u : book url，小说url
+    -w : writer name, 作者
+    -b : book name，书名
+    -f : txt file, txt文件或目录
+
+    -t : send to email address，推送的目标邮箱地址
+
+    -o : output filename，输出电子书文件名
+    -T : ebook type，电子书类型
+
+    -G : get_novel.pl args
+    -C : conv_novel.pl args
+    -S : sendEmail args
+
+    -h : remote host,远程调用的机器名
+
+=head2 download url and convert
+
+    just download and convert ebook, 简单下载或处理电子书
+
+only download novel and convert to ebook 只下载小说并转换为电子书
+
+    run_novel.pl -u "http://www.jjwxc.net/onebook.php?novelid=14838" -T mobi
+    run_novel.pl -u "http://www.jjwxc.net/onebook.php?novelid=14838" -o mytest.epub
+
+only download 1-3 chapter 只下载小说的1-3章，最终输出文件名为abc.mobi
+
+    run_novel.pl -u "http://www.jjwxc.net/onebook.php?novelid=14838" -o abc.mobi -G "-i 1-3"
+
+=head2 deal txt and convert
+
+    run_novel.pl -f 飘灯-风尘叹.txt -T mobi
+    run_novel.pl -f fct.txt -w 飘灯 -b 风尘叹 -T mobi
+
+=head2 send novel with email
+
+need L<sendEmail|http://caspian.dotconf.net/menu/Software/SendEmail/>，需要预先安装L<sendEmail|http://caspian.dotconf.net/menu/Software/SendEmail/>
+
+download/convert novel, and send mobi to email address : xxx@kindle.cn， 下载小说并推送到指定邮箱
+
+local smtp service 本地已安装smtp服务
+
+    run_novel.pl -u "http://www.jjwxc.net/onebook.php?novelid=14838" -T mobi -t "xxx@kindle.cn" -S "-f yyy@somesite.cn"
+    run_novel.pl -f fct.txt -w 飘灯 -b 风尘叹 -T mobi -t "xxx@kindle.cn" -S "-f yyy@somesite.cn"
+
+remote smtp service 使用远程smtp服务
+
+    run_novel.pl -u "http://www.jjwxc.net/onebook.php?novelid=14838" -T mobi -t "xxx@kindle.cn" -G "-i 1-3"  -S "-f yyy@somesite.cn -s smtp.src.com -xu xxx -xp somepwd"
+    run_novel.pl -u "http://www.jjwxc.net/onebook.php?novelid=14838" -T mobi -t "xxx@kindle.cn" -S "-f yyy@qq.com -s smtp.qq.com:587 -o tls=yes -xu yyy -xp 'aaaaaaaaaaaaagga'"
+    run_novel.pl -f fct.txt -w 飘灯 -b 风尘叹 -T mobi -t "xxx@kindle.cn" -S "-f yyy@somesite.cn -s smtp.src.com -xu xxx -xp somepwd"
+    run_novel.pl -f fct.txt -w 飘灯 -b 风尘叹 -T mobi -T mobi -t "xxx@kindle.cn" -S "-f yyy@qq.com -s smtp.qq.com:587 -o tls=yes -xu yyy -xp 'aaaaaaaaaaaaagga'"
+
+use ansible，push ebook to remote host, and then sendEmail 使用ansible把电子书上传到远程服务器，再在远程服务器调用其本机smtp推送
+
+    run_novel.pl -h remote.vps.com -u "http://www.jjwxc.net/onebook.php?novelid=14838" -T mobi -t "xxx@kindle.cn" -S "-f yyy@somesite.cn"
+    run_novel.pl -h remote.vps.com -f fct.txt -w 飘灯 -b 风尘叹 -T mobi -t "xxx@kindle.cn" -S "-f yyy@somesite.cn"
+
+
 =head1 get_novel.pl
 
 =head2 ARG
@@ -127,67 +189,6 @@ only print info, but not download 输出小说信息（不下载）
     conv_novel.pl -f 天平-风起阿房.html -t mobi
     conv_novel.pl -f 施定柔-迷侠记.html -t epub
 
-
-=head1 run_novel.pl
-
-=head2 ARG
-
-    -u : book url，小说url
-    -w : writer name, 作者
-    -b : book name，书名
-    -f : txt file, txt文件或目录
-
-    -t : send to email address，推送的目标邮箱地址
-
-    -o : output filename，输出电子书文件名
-    -T : ebook type，电子书类型
-
-    -G : get_novel.pl args
-    -C : conv_novel.pl args
-    -S : sendEmail args
-
-    -h : remote host,远程调用的机器名
-
-=head2 download url and convert
-
-    just download and convert ebook, 简单下载或处理电子书
-
-only download novel and convert to ebook 只下载小说并转换为电子书
-
-    run_novel.pl -u "http://www.jjwxc.net/onebook.php?novelid=14838" -T mobi
-    run_novel.pl -u "http://www.jjwxc.net/onebook.php?novelid=14838" -o mytest.epub
-
-only download 1-3 chapter 只下载小说的1-3章，最终输出文件名为abc.mobi
-
-    run_novel.pl -u "http://www.jjwxc.net/onebook.php?novelid=14838" -o abc.mobi -G "-i 1-3"
-
-=head2 deal txt and convert
-
-    run_novel.pl -f 飘灯-风尘叹.txt -T mobi
-    run_novel.pl -f fct.txt -w 飘灯 -b 风尘叹 -T mobi
-
-=head2 send novel with email
-
-need L<sendEmail|http://caspian.dotconf.net/menu/Software/SendEmail/>，需要预先安装L<sendEmail|http://caspian.dotconf.net/menu/Software/SendEmail/>
-
-download/convert novel, and send mobi to email address : xxx@kindle.cn， 下载小说并推送到指定邮箱
-
-local smtp service 本地已安装smtp服务
-
-    run_novel.pl -u "http://www.jjwxc.net/onebook.php?novelid=14838" -T mobi -t "xxx@kindle.cn" -S "-f yyy@somesite.cn"
-    run_novel.pl -f fct.txt -w 飘灯 -b 风尘叹 -T mobi -t "xxx@kindle.cn" -S "-f yyy@somesite.cn"
-
-remote smtp service 使用远程smtp服务
-
-    run_novel.pl -u "http://www.jjwxc.net/onebook.php?novelid=14838" -T mobi -t "xxx@kindle.cn" -G "-i 1-3"  -S "-f yyy@somesite.cn -s smtp.src.com -xu xxx -xp somepwd"
-    run_novel.pl -u "http://www.jjwxc.net/onebook.php?novelid=14838" -T mobi -t "xxx@kindle.cn" -S "-f yyy@qq.com -s smtp.qq.com:587 -o tls=yes -xu yyy -xp 'aaaaaaaaaaaaagga'"
-    run_novel.pl -f fct.txt -w 飘灯 -b 风尘叹 -T mobi -t "xxx@kindle.cn" -S "-f yyy@somesite.cn -s smtp.src.com -xu xxx -xp somepwd"
-    run_novel.pl -f fct.txt -w 飘灯 -b 风尘叹 -T mobi -T mobi -t "xxx@kindle.cn" -S "-f yyy@qq.com -s smtp.qq.com:587 -o tls=yes -xu yyy -xp 'aaaaaaaaaaaaagga'"
-
-use ansible，push ebook to remote host, and then sendEmail 使用ansible把电子书上传到远程服务器，再在远程服务器调用其本机smtp推送
-
-    run_novel.pl -h remote.vps.com -u "http://www.jjwxc.net/onebook.php?novelid=14838" -T mobi -t "xxx@kindle.cn" -S "-f yyy@somesite.cn"
-    run_novel.pl -h remote.vps.com -f fct.txt -w 飘灯 -b 风尘叹 -T mobi -t "xxx@kindle.cn" -S "-f yyy@somesite.cn"
 
 =head1 FUNCTION
 
