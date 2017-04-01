@@ -8,6 +8,8 @@ L<Novel::Robot>
 
 download novel /bbs thread 小说/贴子下载器
 
+use calibre's ebook-convert 需要安装calibre
+
 =head2 site 
 
 support novel/forum website 支持小说/贴子站点
@@ -21,6 +23,49 @@ support robot ouput file type, 支持小说输出形式
 L<Novel::Robot::Packer>
 
 =head1 run_novel.pl
+
+=head2 download url and convert
+
+    just download and convert ebook, 简单下载或处理电子书
+
+only download novel and convert to ebook 只下载小说并转换为电子书
+
+    run_novel.pl -u "http://www.jjwxc.net/onebook.php?novelid=14838" -T mobi
+    run_novel.pl -u "http://www.jjwxc.net/onebook.php?novelid=14838" -o mytest.epub
+
+only download 1-3 chapter 只下载小说的1-3章，最终输出文件名为abc.mobi
+
+    run_novel.pl -u "http://www.jjwxc.net/onebook.php?novelid=14838" -o abc.mobi -G "-i 1-3"
+
+=head2 deal txt and convert
+
+convert txt to ebook, txt is utf8 encoding，把txt文件转成电子书，txt内容为utf8编码
+
+    run_novel.pl -f 飘灯-风尘叹.txt -T mobi
+    run_novel.pl -f fct.txt -w 飘灯 -b 风尘叹 -T mobi
+
+=head2 send novel with email
+
+download/convert novel, and send mobi to email address : xxx@kindle.cn， 下载小说并推送到指定邮箱
+
+need L<sendEmail|http://caspian.dotconf.net/menu/Software/SendEmail/>，需要预先安装L<sendEmail|http://caspian.dotconf.net/menu/Software/SendEmail/>
+
+local smtp service 本地已安装smtp服务
+
+    run_novel.pl -u "http://www.jjwxc.net/onebook.php?novelid=14838" -T mobi -t "xxx@kindle.cn" -S "-f yyy@somesite.cn"
+    run_novel.pl -f fct.txt -w 飘灯 -b 风尘叹 -T mobi -t "xxx@kindle.cn" -S "-f yyy@somesite.cn"
+
+remote smtp service 使用远程smtp服务
+
+    run_novel.pl -u "http://www.jjwxc.net/onebook.php?novelid=14838" -T mobi -t "xxx@kindle.cn" -G "-i 1-3"  -S "-f yyy@somesite.cn -s smtp.src.com -xu xxx -xp somepwd"
+    run_novel.pl -u "http://www.jjwxc.net/onebook.php?novelid=14838" -T mobi -t "xxx@kindle.cn" -S "-f yyy@qq.com -s smtp.qq.com:587 -o tls=yes -xu yyy -xp 'aaaaaaaaaaaaagga'"
+    run_novel.pl -f fct.txt -w 飘灯 -b 风尘叹 -T mobi -t "xxx@kindle.cn" -S "-f yyy@somesite.cn -s smtp.src.com -xu xxx -xp somepwd"
+    run_novel.pl -f fct.txt -w 飘灯 -b 风尘叹 -T mobi -T mobi -t "xxx@kindle.cn" -S "-f yyy@qq.com -s smtp.qq.com:587 -o tls=yes -xu yyy -xp 'aaaaaaaaaaaaagga'"
+
+use ansible，push ebook to remote host, and then sendEmail 使用ansible把电子书上传到远程服务器，再在远程服务器调用其本机smtp推送
+
+    run_novel.pl -h remote.vps.com -u "http://www.jjwxc.net/onebook.php?novelid=14838" -T mobi -t "xxx@kindle.cn" -S "-f yyy@somesite.cn"
+    run_novel.pl -h remote.vps.com -f fct.txt -w 飘灯 -b 风尘叹 -T mobi -t "xxx@kindle.cn" -S "-f yyy@somesite.cn"
 
 =head2 ARG
 
@@ -40,83 +85,8 @@ L<Novel::Robot::Packer>
 
     -h : remote host,远程调用的机器名
 
-=head2 download url and convert
-
-    just download and convert ebook, 简单下载或处理电子书
-
-only download novel and convert to ebook 只下载小说并转换为电子书
-
-    run_novel.pl -u "http://www.jjwxc.net/onebook.php?novelid=14838" -T mobi
-    run_novel.pl -u "http://www.jjwxc.net/onebook.php?novelid=14838" -o mytest.epub
-
-only download 1-3 chapter 只下载小说的1-3章，最终输出文件名为abc.mobi
-
-    run_novel.pl -u "http://www.jjwxc.net/onebook.php?novelid=14838" -o abc.mobi -G "-i 1-3"
-
-=head2 deal txt and convert
-
-    run_novel.pl -f 飘灯-风尘叹.txt -T mobi
-    run_novel.pl -f fct.txt -w 飘灯 -b 风尘叹 -T mobi
-
-=head2 send novel with email
-
-need L<sendEmail|http://caspian.dotconf.net/menu/Software/SendEmail/>，需要预先安装L<sendEmail|http://caspian.dotconf.net/menu/Software/SendEmail/>
-
-download/convert novel, and send mobi to email address : xxx@kindle.cn， 下载小说并推送到指定邮箱
-
-local smtp service 本地已安装smtp服务
-
-    run_novel.pl -u "http://www.jjwxc.net/onebook.php?novelid=14838" -T mobi -t "xxx@kindle.cn" -S "-f yyy@somesite.cn"
-    run_novel.pl -f fct.txt -w 飘灯 -b 风尘叹 -T mobi -t "xxx@kindle.cn" -S "-f yyy@somesite.cn"
-
-remote smtp service 使用远程smtp服务
-
-    run_novel.pl -u "http://www.jjwxc.net/onebook.php?novelid=14838" -T mobi -t "xxx@kindle.cn" -G "-i 1-3"  -S "-f yyy@somesite.cn -s smtp.src.com -xu xxx -xp somepwd"
-    run_novel.pl -u "http://www.jjwxc.net/onebook.php?novelid=14838" -T mobi -t "xxx@kindle.cn" -S "-f yyy@qq.com -s smtp.qq.com:587 -o tls=yes -xu yyy -xp 'aaaaaaaaaaaaagga'"
-    run_novel.pl -f fct.txt -w 飘灯 -b 风尘叹 -T mobi -t "xxx@kindle.cn" -S "-f yyy@somesite.cn -s smtp.src.com -xu xxx -xp somepwd"
-    run_novel.pl -f fct.txt -w 飘灯 -b 风尘叹 -T mobi -T mobi -t "xxx@kindle.cn" -S "-f yyy@qq.com -s smtp.qq.com:587 -o tls=yes -xu yyy -xp 'aaaaaaaaaaaaagga'"
-
-use ansible，push ebook to remote host, and then sendEmail 使用ansible把电子书上传到远程服务器，再在远程服务器调用其本机smtp推送
-
-    run_novel.pl -h remote.vps.com -u "http://www.jjwxc.net/onebook.php?novelid=14838" -T mobi -t "xxx@kindle.cn" -S "-f yyy@somesite.cn"
-    run_novel.pl -h remote.vps.com -f fct.txt -w 飘灯 -b 风尘叹 -T mobi -t "xxx@kindle.cn" -S "-f yyy@somesite.cn"
-
 
 =head1 get_novel.pl
-
-=head2 ARG
-
-    -s : site, 指定查询的站点
-
-    -u : book url，小说url
-    -w : writer url 作者专栏URL / writer name 作者名
-    -b : book name，书名
-    -f : txt file / txt file dir, 指定文本文件来源(可以是单个目录或文件)
-    -q : query type, 查询的类型
-    -k : query keyword, 查询的关键字
-
-    -t : save type, 小说保存类型，例如txt/html
-    -o : output filename, 保存的小说文件名
-    -D : only print info, not download, 只输出信息，不下载，或进行其他处理操作
-    -C : with_toc, 小说保存时是否生成目录(默认是)
-    
-    -g : grep_content , 提取关键字
-    -G : filter_content , 过滤关键字
-    -i : {min/max}_{tiezi_page/chapter_num}, 只取 x-y 章
-    -A : only_poster, 贴子只看楼主
-    -N : min_floor_word_num, 贴子每层最小字数
-    -n : split chapter num, 单个文件最大章节数(一本小说可以分多个文件，每个文件最多n章)
-
-    -r : chapter regex, 指定分割章节的正则表达式(例如："第[ \\t\\d]+章")
-    -E : select menu, 是否输出小说选择菜单
-    -B : forum board number, 版块序号，例如hjj的xq版块号为3
-
-    -I : {min/max}_{query/board}_page, 结果列表只取 x-y 页
-    -M : max_{query_item/board_item}_num, 结果列表最多取x项
-    -m : max_tiezi_floor_num, 结果列表最多取x项
-
-    -v : verbose, 显示进度条(默认显示)
-    -p : max_process_num, 进程个数 
 
 =head2 download 
 
@@ -173,6 +143,40 @@ only print info, but not download 输出小说信息（不下载）
     get_novel.pl -u "http://www.jjwxc.net/onebook.php?novelid=14838"  -D 1
     get_novel.pl -b "http://www.jjwxc.net/oneauthor.php?authorid=14644" -D 1
     get_novel.pl -s jjwxc -q 作品 -k 断情逐妖记 -D 1
+
+=head2 ARG
+
+    -s : site, 指定查询的站点
+
+    -u : book url，小说url
+    -w : writer url 作者专栏URL / writer name 作者名
+    -b : book name，书名
+    -f : txt file / txt file dir, 指定文本文件来源(可以是单个目录或文件)
+    -q : query type, 查询的类型
+    -k : query keyword, 查询的关键字
+
+    -t : save type, 小说保存类型，例如txt/html
+    -o : output filename, 保存的小说文件名
+    -D : only print info, not download, 只输出信息，不下载，或进行其他处理操作
+    -C : with_toc, 小说保存时是否生成目录(默认是)
+    
+    -g : grep_content , 提取关键字
+    -G : filter_content , 过滤关键字
+    -i : {min/max}_{tiezi_page/chapter_num}, 只取 x-y 章
+    -A : only_poster, 贴子只看楼主
+    -N : min_floor_word_num, 贴子每层最小字数
+    -n : split chapter num, 单个文件最大章节数(一本小说可以分多个文件，每个文件最多n章)
+
+    -r : chapter regex, 指定分割章节的正则表达式(例如："第[ \\t\\d]+章")
+    -E : select menu, 是否输出小说选择菜单
+    -B : forum board number, 版块序号，例如hjj的xq版块号为3
+
+    -I : {min/max}_{query/board}_page, 结果列表只取 x-y 页
+    -M : max_{query_item/board_item}_num, 结果列表最多取x项
+    -m : max_tiezi_floor_num, 结果列表最多取x项
+
+    -v : verbose, 显示进度条(默认显示)
+    -p : max_process_num, 进程个数 
 
 
 =head1 conv_novel.pl
