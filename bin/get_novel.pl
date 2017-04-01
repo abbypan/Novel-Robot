@@ -7,7 +7,6 @@ use Encode::Locale;
 use Encode;
 use Getopt::Std;
 use Novel::Robot;
-use POSIX qw/ceil/;
 
 $| = 1;
 binmode( STDIN,  ":encoding(console_in)" );
@@ -15,141 +14,68 @@ binmode( STDOUT, ":encoding(console_out)" );
 binmode( STDERR, ":encoding(console_out)" );
 
 my %opt;
-getopt( 'usfwbtoqkDCvgGiANnrEpBIMm', \%opt );
+getopt( 'sufwbRtoCGFANDpviP', \%opt );
 
-my %opt_out = read_option(%opt);
-our $xs = Novel::Robot->new( type => $opt_out{type}, site => $opt_out{site} );
-
-
-my $info;
-my $items_ref;
-
-if ( $opt{f} ) {
-    my @path = split ',', $opt{f};
-    $xs->get_item( \@path, %opt_out );
-}
-elsif ( $opt{b} ) {    # writer/ board
-    ( $info, $items_ref ) = $xs->{parser}->get_board_ref( $opt{b}, %opt_out );
-}
-elsif ( $opt{q} ) {    #query
-    ( $info, $items_ref ) =
-      $xs->{parser}->get_query_ref( $opt_out{query_keyword}, %opt_out );
-}
-elsif ( $opt{n} ) {
-    get_novel_split( $xs, $opt{u}, %opt_out );
-}
-elsif ( $opt{u} ) {
-    if($opt{D} and ($xs->{parser}->site_type() eq 'novel')){
-        my $r = $xs->{parser}->get_index_ref($opt{u}, %opt_out);
-        print "$r->{writer},$r->{book},$r->{url},$r->{chapter_num}\n";
-    }else{
-        $xs->get_item( $opt{u}, %opt_out );
-    }
-}
-
-if ($items_ref) {
-    my $select = $opt{E} ? $xs->select_item( $info, $items_ref ) : $items_ref;
-    for my $r (@$select) {
-        my $u = $r->{url};
-        if($opt{D}){
-            my $x = $r->{writer} || $info;
-            print "$x,$r->{book},$r->{url}\n";
-        }else{
-            print "\rselect : $u\n";
-            $xs->get_item( $u, %opt_out );
-        }
-    } ## end for my $r (@$select)
-}
+my %opt_out = read_option( %opt );
 
 sub read_option {
-    my (%opt) = @_;
+  my ( %opt ) = @_;
 
-    my %opt_out = (
-        board    => $opt{B},
-        book     => $opt{u} ? decode( locale => $opt{u} ) : undef,
-        chapter_regex => $opt{r} ? decode( locale => $opt{r} ) : undef,
-        max_process_num => $opt{p} // 1,
-        only_poster     => $opt{A},
-        output          => $opt{o},
-        query_keyword => $opt{k} ? decode( locale => $opt{k} ) : undef,
-        query_type    => $opt{q} ? decode( locale => $opt{q} ) : undef,
-        select_menu   => $opt{E},
-        site => $opt{s} || $opt{u} || $opt{b},
-        step_chapter_num => $opt{n},
-        type => $opt{t} || 'html',
-        verbose  => $opt{v} // 1,
-        with_toc => $opt{C} // 1,
-        writer => $opt{w} ? decode( locale => $opt{w} ) : undef,
-        grep_content => $opt{g} ? decode( locale => $opt{g} ) : undef, 
-        filter_content => $opt{G} ? decode( locale => $opt{G} ) : undef,  
-    );
+  my %opt_out = (
+    site => $opt{s} || $opt{u} || $opt{f},
 
-    # board ->
-    my ( $class, $item ) = $opt{b} ? qw/board item/ : qw/query item/;
-    if ( $opt{I} ) {
-        ( $opt_out{"min_${class}_page"}, $opt_out{"max_${class}_page"} ) =
-          split_index($opt{I});
-    }
+    url => $opt{u},
 
-    if ( $opt{M} ) {
-        $opt_out{"max_${class}_${item}_num"} = $opt{M};
-    }
+    file          => $opt{f},
+    writer        => $opt{w} ? decode( locale => $opt{w} ) : undef,
+    book          => $opt{b} ? decode( locale => $opt{b} ) : undef,
+    chapter_regex => $opt{R} ? decode( locale => $opt{R} ) : undef,
 
-    # tiezi ->
-    if ( $opt{i} ) {
-        @opt_out{qw/min_tiezi_page max_tiezi_page/}   = split_index($opt{i});
-        @opt_out{qw/min_chapter_num max_chapter_num/} = split_index($opt{i});
-    }
+    type => $opt{t} || 'html',
+    output   => $opt{o},
+    with_toc => $opt{C} // 1,
 
-    $opt_out{max_tiezi_floor_num} = $opt{m};
+    grep_content   => $opt{G} ? decode( locale => $opt{G} ) : undef,
+    filter_content => $opt{F} ? decode( locale => $opt{F} ) : undef,
+    only_poster    => $opt{A},
+    min_content_word_num => $opt{N},
 
-    # floor ->
-    $opt_out{min_floor_word_num} = $opt{N};
+    max_process_num => $opt{p} // 1,
 
-    if($opt{f}){
-        $opt_out{site} = 'txt';
-        my $tf = decode(locale => $opt{f});
-        my ($tw, $tb) = $tf=~m#([^\/\\]+)-([^\/\\]+)\.[^.]+$#;
-        $opt_out{book} = $opt{b} ? decode( locale => $opt{b} ) : $tb,
-        $opt_out{writer} = $opt{w} ? decode( locale => $opt{w} ) : $tw,
-    }
+    not_download => $opt{D},
+    verbose      => $opt{v} // 1,
+  );
 
-    return %opt_out;
+  if ( $opt{P} ) {
+    @opt_out{qw/min_page_num max_page_num/} = Novel::Robot::split_index( $opt{P} );
+  }
+
+  if ( $opt{i} ) {
+    @opt_out{qw/min_item_num max_item_num/} = Novel::Robot::split_index( $opt{i} );
+  }
+
+  if ( $opt{f} ) {
+    $opt_out{site} = 'txt';
+    my $tf = decode( locale => $opt{f} );
+    my ( $tw, $tb ) = $tf =~ m#([^\/\\]+)-([^\/\\]+)\.[^.]+$#;
+    $opt_out{writer} = $tw unless ( defined $opt_out{writer} );
+    $opt_out{book}   = $tb unless ( defined $opt_out{book} );
+  }
+
+  return %opt_out;
+} ## end sub read_option
+
+our $xs = Novel::Robot->new( type => $opt_out{type}, site => $opt_out{site} );
+
+if ( $opt{f} ) {
+  my @path = split ',', $opt{f};
+  $xs->get_item( \@path, %opt_out );
+} elsif ( $opt{u} ) {
+  if ( $opt{D} ) {
+    my $r = $xs->{parser}->get_item_info( $opt{u}, %opt_out, max_page_num => 1 );
+    print join( ",", $r->{writer} || '', $r->{book} || $r->{title} || '', $r->{url} || '', $r->{chapter_num} || '' ), "\n";
+  } else {
+    $xs->get_item( $opt{u}, %opt_out );
+  }
 }
 
-sub get_novel_split {
-    my ( $self, $index_url, %opt ) = @_;
-
-    my ( $m, $n ) = ( 1, undef );
-    my $info = $self->{parser}->get_index_ref($index_url);
-    my $num  = $info->{chapter_num};
-    my $en   = ceil( log( $num + 1 ) / log(10) );
-
-    for ( my $m = 1 ; $m <= $num ; $m += $opt{step_chapter_num} ) {
-        my $n = $m + $opt{step_chapter_num} - 1;
-        $n = $num if ( $n > $num );
-
-        my @info_list = ( $info->{writer}, $info->{book}, $n );
-        my $out =
-          sprintf( "%s-%s-%0${en}d.%s", @info_list, $self->{packer}->suffix() );
-
-        $self->get_item(
-            $index_url,
-            %opt,
-            min_chapter_num => $m,
-            max_chapter_num => $n,
-            output          => encode( locale => $out ),
-            title           => sprintf( "%s 《%s》 %0${en}d", @info_list ),
-        );
-    }
-}
-
-sub split_index {
-    my ($s) = @_;
-    return ($s, $s) if($s=~/^\d+$/);
-    if($s=~/^\d*-\d*$/){
-        my ($min, $max) = split '-', $s;
-        return ($min, $max);
-    }
-    return;
-}

@@ -26,14 +26,14 @@ L<Novel::Robot::Packer>
 
 =head2 download url and convert
 
-    just download and convert ebook, 简单下载或处理电子书
+download and convert ebook, 简单下载或处理电子书
 
-only download novel and convert to ebook 只下载小说并转换为电子书
+download the whole novel and convert to ebook 下载全本小说并转换为电子书
 
     run_novel.pl -u "http://www.jjwxc.net/onebook.php?novelid=14838" -T mobi
     run_novel.pl -u "http://www.jjwxc.net/onebook.php?novelid=14838" -o mytest.epub
 
-only download 1-3 chapter 只下载小说的1-3章，最终输出文件名为abc.mobi
+download 1-3 chapter 下载小说的1-3章，最终输出文件名为abc.mobi
 
     run_novel.pl -u "http://www.jjwxc.net/onebook.php?novelid=14838" -o abc.mobi -G "-i 1-3"
 
@@ -90,94 +90,63 @@ use ansible，push ebook to remote host, and then sendEmail 使用ansible把电�
 
 =head2 download 
 
-下载
+download novel from url
 
-    get_novel.pl -u [url] -t [type] -i [chapter_number_list] -o [dst_file/dst_dir] -g [grep_content] -G [filter_content]
-    get_novel.pl -u [小说目录页url] -t [目标文件类型] -i [章节号] -o [目标文件名/目标文件夹] -g [提取关键字] -G [过滤关键字]
+下载小说
+
+    get_novel.pl -u [url] -t [type] -i [min/max-item-num] -o [dst_file/dst_dir]
+    get_novel.pl -u [小说目录页url] -t [目标文件类型] -i [章节号] -o [目标文件名/目标文件夹]
 
     get_novel.pl -u "http://www.jjwxc.net/onebook.php?novelid=14838" -t txt
     get_novel.pl -u "http://www.jjwxc.net/onebook.php?novelid=14838" -t html
     get_novel.pl -u "http://www.jjwxc.net/onebook.php?novelid=14838" -t web -o some_dir
 
-=head2 download and split 
-
-download and split novel into pieces, each piece contains $n chapters 
-
-分段下载小说
-
-    get_novel.pl -u [url] -t [type] -n [split_chapter_number_step]
-    get_novel.pl -u [小说目录页url] -t [目标类型] -n [分段章节数]
-
-    get_novel.pl -u "http://www.jjwxc.net/onebook.php?novelid=14838" -n 10 -t txt
-
 =head2 convert txt
 
-convert txt, parse chapter name, add toc 
+convert txt, parse chapter name with regex
 
-转换txt，加目录
+转换txt，可指定章节标题的正则式
 
-    get_novel.pl -w [writer] -b [book] -f [txt_file/directory] -r [chapter_regex] -t [type]
-    get_novel.pl -w [作者] -b [书名] -f [txt文件或目录] -r [章节标题匹配的正则式] -t [目标文件类型]
+    get_novel.pl -w [writer] -b [book] -f [txt_file/directory] -t [type] -R [chapter_regex]
+    get_novel.pl -w [作者] -b [书名] -f [txt文件或目录] -t [目标文件类型] -R [章节标题匹配的正则式]
     get_novel.pl -w 牵机 -b 断情逐妖记 -f dq1.txt -t html
-    get_novel.pl -w 牵机 -b 断情逐妖记 -f dq1.txt,dq2.txt,dir1 -r "第[ \\t\\d]+章" -t html
+    get_novel.pl -w 牵机 -b 断情逐妖记 -f dq1.txt,dq2.txt,dir1 -R "第[ \\t\\d]+章" -t html
     get_novel.pl -f 飘灯-像妖怪一样自由.txt -t html
-
-=head2 bulk download novels/threads 
-
-批量下载小说/贴子
-
-    get_novel.pl -b [board_url/writer_url] -m [select_menu_or_not] -t [packer_type]
-    get_novel.pl -s [site] -q [query_type] -k [query_keyword] -m [select_menu_or_not] -t [packer_type]
-
-    get_novel.pl -b "http://www.jjwxc.net/oneauthor.php?authorid=14644" -m 1 -t html
-    get_novel.pl -s jjwxc -q 作品 -k 断情逐妖记 -m 1 -t html
 
 =head2 only print info
 
 only print info, but not download 输出小说信息（不下载）
 
     get_novel.pl -u [url] -D 1
-    get_novel.pl -b [board_url/writer_url] -D 1
-    get_novel.pl -s [site] -q [query_type] -k [query_keyword] -D 1
-
     get_novel.pl -u "http://www.jjwxc.net/onebook.php?novelid=14838"  -D 1
-    get_novel.pl -b "http://www.jjwxc.net/oneauthor.php?authorid=14644" -D 1
-    get_novel.pl -s jjwxc -q 作品 -k 断情逐妖记 -D 1
 
 =head2 ARG
 
-    -s : site, 指定查询的站点
+    -s : site, 指定站点
 
     -u : book url，小说url
-    -w : writer url 作者专栏URL / writer name 作者名
+
+    -w : writer name 作者名
     -b : book name，书名
     -f : txt file / txt file dir, 指定文本文件来源(可以是单个目录或文件)
-    -q : query type, 查询的类型
-    -k : query keyword, 查询的关键字
+    -R : chapter regex, 指定分割章节的正则表达式(例如："第[ \\t\\d]+章")
 
     -t : save type, 小说保存类型，例如txt/html
     -o : output filename, 保存的小说文件名
-    -D : only print info, not download, 只输出信息，不下载，或进行其他处理操作
     -C : with_toc, 小说保存时是否生成目录(默认是)
-    
-    -g : grep_content , 提取关键字
-    -G : filter_content , 过滤关键字
-    -i : {min/max}_{tiezi_page/chapter_num}, 只取 x-y 章
+
+    -G : grep_content , 提取关键字
+    -F : filter_content , 过滤关键字
     -A : only_poster, 贴子只看楼主
-    -N : min_floor_word_num, 贴子每层最小字数
-    -n : split chapter num, 单个文件最大章节数(一本小说可以分多个文件，每个文件最多n章)
+    -N : min_content_word_num, 贴子每楼层最小字数
 
-    -r : chapter regex, 指定分割章节的正则表达式(例如："第[ \\t\\d]+章")
-    -E : select menu, 是否输出小说选择菜单
-    -B : forum board number, 版块序号，例如hjj的xq版块号为3
+    -P : min_page_num-max_page_num, 只取 x-y 页
+    -i : min_item_num-max_item_num, 只取 x-y 章/楼
 
-    -I : {min/max}_{query/board}_page, 结果列表只取 x-y 页
-    -M : max_{query_item/board_item}_num, 结果列表最多取x项
-    -m : max_tiezi_floor_num, 结果列表最多取x项
-
-    -v : verbose, 显示进度条(默认显示)
     -p : max_process_num, 进程个数 
 
+    -D : only print info, not download, 只输出信息，不下载
+    -v : verbose, 显示进度条(默认显示)
 
 =head1 conv_novel.pl
 
@@ -193,6 +162,45 @@ only print info, but not download 输出小说信息（不下载）
     conv_novel.pl -f 天平-风起阿房.html -t mobi
     conv_novel.pl -f 施定柔-迷侠记.html -t epub
 
+=head1 bulk_novel.pl
+
+    get bulk novel info: <writer,book,url> , default option is not download
+
+    批量获取版块/作者专栏的小说信息，默认-D=1不下载
+
+    bulk_novel.pl -b "http://www.jjwxc.net/oneauthor.php?authorid=14644"
+    bulk_novel.pl -b "http://www.jjwxc.net/oneauthor.php?authorid=14644" -i 1-3
+
+    查询版块贴子信息，默认-D=1不下载
+    bulk_novel.pl -b "http://bbs.jjwxc.net/board.php?board=153&page=0" -P 1-2
+    bulk_novel.pl -b "http://bbs.jjwxc.net/board.php?board=153&page=0" -i 1-20
+
+    批量查询  
+    bulk_novel.pl -s jjwxc -q 作者 -k 牵机 -i 1-10
+    bulk_novel.pl -s jjwxc -q 作品 -k 网王 -P 1-3
+    bulk_novel.pl -s hjj -b 153 -q 贴子主题 -k 迷侠记
+
+    下载专栏内的所有小说
+    bulk_novel.pl -b "http://www.jjwxc.net/oneauthor.php?authorid=14644" -D 0
+    
+    手动选择下载部分小说，批量转换为mobi
+    bulk_novel.pl -s jjwxc -q 作者 -k 牵机 -P 1 > raw_booklist.txt
+    awk -F, '$1=="牵机"' raw_booklist.txt > refine_booklist.txt
+    parallel --colsep , run_novel.pl -u "{3}" -T mobi :::: refine_booklist.txt
+
+=head2 ARG
+
+    -s : site, 指定站点
+
+    -b : board_url / board_id  版块url，或版块编号
+
+    -q : query type, 查询类型
+    -k : query keyword, 查询关键字
+
+    -P : min_page_num-max_page_num, 只取 x-y 页
+    -i : min_item_num-max_item_num, 只取 x-y 项
+
+    -D : only print info, not download, 只输出信息，不下载
 
 =head1 FUNCTION
 
@@ -233,33 +241,27 @@ download one novel/thread 下载整本小说
             writer => '牵机', book => '断情逐妖记', 
             );
 
-=head2 bulk download 
+=head2 bulk novels and download 
 
-bulk download writer's novel / board's threads 下载作者专栏/版块
+bulk download writer's novel 下载作者专栏
 
     $xs->set_parser('jjwxc');
     my $writer_url = 'http://www.jjwxc.net/oneauthor.php?authorid=14644';
     my ($writer_name, $books_ref) = $xs->{parser}->get_board_ref($writer_url, %opt);
     $xs->get_item($_, %opt) for @$books_ref;
 
+bulk download board's threads 下载版块
+
     $xs->set_parser('hjj');
     my $board_url = "http://bbs.jjwxc.net/showmsg.php?board=153";
     my ($info, $tiezis_ref) = $xs->{parser}->get_board_ref($board_url, %opt);
     $xs->get_item($_, %opt) for @$tiezis_ref;
 
-=head2  query and download 
-
-查询并下载
+query novels/threads 查询关键字并下载
 
     my $query_type = '作者';
     my $query_keyword='牵机';
     my ($info, $items_ref) = $xs->{parser}->get_query_ref($query_keyword, query_type => $query_type, %opt);
     $xs->get_item($_, %opt) for @$items_ref;
-
-=head2 select_item 
-
-在Term下选择小说
-
-    my $select_books_ref = $xs->select_item($banner_info, $books_ref);
 
 =cut

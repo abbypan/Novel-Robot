@@ -6,7 +6,6 @@ use utf8;
 
 use Encode::Locale;
 use Encode;
-use Term::Menus;
 use Parallel::ForkManager;
 
 use Novel::Robot::Parser;
@@ -51,35 +50,14 @@ sub get_item {
     return wantarray ? ( $r, $item_ref ) : $r;
 } ## end sub get_item
 
-sub select_item {
-    my ( $self, $banner, $item_list ) = @_;
-
-    my %item = map {
-        my $class = $_->{series} || $_->{writer} || $_->{board} || '';
-        my $name  = $_->{book}   || $_->{title}  || $_->{topic} || '';
-        my $n     = "$class --- $name";
-
-        $n => $_->{url};
-    } @$item_list;
-
-    my %menu = (
-        Select => 'Many',
-        Banner => $banner || 'Select List',
-        Item_1 => {
-            Text   => "]Convey[",
-            Convey => [ sort keys %item ],
-        },
-    );
-
-    my @select_items = &Menu( \%menu );
-    my @select_results =
-      map {
-        my ( $class, $name ) = /^(.*) --- (.*)$/;
-        { class => $class, name => $name, url => $item{$_} };
-      } @select_items;
-
-    return \@select_results;
-} ## end sub select_item
-
+sub split_index {
+  my $s = $_[-1];
+  return ( $s, $s ) if ( $s =~ /^\d+$/ );
+  if ( $s =~ /^\d*-\d*$/ ) {
+    my ( $min, $max ) = split '-', $s;
+    return ( $min, $max );
+  }
+  return;
+}
 
 1;
