@@ -109,7 +109,7 @@ sub send_ebook {
     system( qq[ansible $o{h} -m shell -a 'rm $f_e'] );
   } else {
     $cmd = encode( locale => $cmd );
-    `$cmd`;
+    system($cmd);
   }
   unlink( $f_e );
 }
