@@ -55,9 +55,8 @@ sub read_option {
   }
 
   if ( $opt{f} ) {
-    $opt_out{site} = 'txt';
     my $tf = decode( locale => $opt{f} );
-    my ( $tw, $tb ) = $tf =~ m#([^\/\\]+)-([^\/\\]+)\.[^.]+$#;
+    my ( $tw, $tb, $suffix ) = $tf =~ m#([^\/\\]+)-([^\/\\]+)\.([^.]+)$#;
     $opt_out{writer} = $tw unless ( defined $opt_out{writer} );
     $opt_out{book}   = $tb unless ( defined $opt_out{book} );
   }
