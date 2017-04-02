@@ -44,7 +44,7 @@ download 1-3 chapter 下载小说的1-3章，最终输出文件名为abc.mobi
 
 =head2 deal txt and convert
 
-convert txt to ebook, txt is utf8 encoding，把txt文件转成电子书，txt内容为utf8编码
+convert txt to ebook, 把txt文件转成电子书
 
     run_novel.pl -f 飘灯-风尘叹.txt -T mobi
     run_novel.pl -f fct.txt -w 飘灯 -b 风尘叹 -T mobi
