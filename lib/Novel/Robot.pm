@@ -11,7 +11,7 @@ use Parallel::ForkManager;
 use Novel::Robot::Parser;
 use Novel::Robot::Packer;
 
-our $VERSION = 0.38;
+our $VERSION = 0.39;
 
 sub new {
     my ( $self, %opt ) = @_;
