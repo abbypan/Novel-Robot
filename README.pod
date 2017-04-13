@@ -49,6 +49,12 @@ convert txt to ebook, 把txt文件转成电子书
     run_novel.pl -f 飘灯-风尘叹.txt -T mobi
     run_novel.pl -f fct.txt -w 飘灯 -b 风尘叹 -T mobi
 
+=head2  download by site-writer-book and convert
+
+    run_novel.pl -s lofter -T mobi -w chuweizhiyu -b 时之足
+    run_novel.pl -s lofter -T mobi -w chuweizhiyu -b 时之足 -G "-i 3-"
+    run_novel.pl -s lofter -T mobi -w chuweizhiyu -b 时之足 -G "-i 3-5"
+
 =head2 send novel with email
 
 download/convert novel, use L<sendEmail|http://caspian.dotconf.net/menu/Software/SendEmail/> send mobi to email address : xxx@kindle.cn
@@ -101,12 +107,17 @@ download novel from url
 
 下载小说
 
-    get_novel.pl -u [url] -t [type] -i [min/max-item-num] -o [dst_file/dst_dir]
-    get_novel.pl -u [小说目录页url] -t [目标文件类型] -i [章节号] -o [目标文件名/目标文件夹]
+    get_novel.pl -u [url] -t [type] -i [min_item_num-max_item_num] -o [dst_file/dst_dir]
+    get_novel.pl -u [小说目录页url] -t [目标文件类型] -i [起止章节号] -o [目标文件名/目标文件夹]
 
     get_novel.pl -u "http://www.jjwxc.net/onebook.php?novelid=14838" -t txt
     get_novel.pl -u "http://www.jjwxc.net/onebook.php?novelid=14838" -t html
     get_novel.pl -u "http://www.jjwxc.net/onebook.php?novelid=14838" -t web -o some_dir
+
+    get_novel.pl -u "http://www.jjwxc.net/onebook.php?novelid=14838" -t html -i 3
+    get_novel.pl -u "http://www.jjwxc.net/onebook.php?novelid=14838" -t html -i 3-4
+    get_novel.pl -u "http://www.jjwxc.net/onebook.php?novelid=14838" -t html -i 3-
+    get_novel.pl -u "http://www.jjwxc.net/onebook.php?novelid=14838" -t html -i -3
 
 =head2 convert txt
 

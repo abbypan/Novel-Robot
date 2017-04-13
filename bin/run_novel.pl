@@ -17,7 +17,7 @@ binmode( STDOUT, ":encoding(console_out)" );
 binmode( STDERR, ":encoding(console_out)" );
 
 my %opt;
-getopt( 'fwbutTGCSoh', \%opt );
+getopt( 'sfwbutTGCSoh', \%opt );
 
 if($opt{o} and $opt{o}=~m#[^\/\\]+\.[^\/\\]+$#){
     my ($t) = $opt{o}=~m#[^\/\\]+\.([^\/\\]+)$#;
@@ -26,7 +26,7 @@ if($opt{o} and $opt{o}=~m#[^\/\\]+\.[^\/\\]+$#){
     $opt{T} ||= 'mobi';
 }
 
-for ( qw/G C S o/ ) {
+for ( qw/G C S o w b/ ) {
   $opt{$_} = exists $opt{$_} ? decode( locale => $opt{$_} ) : '';
 }
 
@@ -51,12 +51,15 @@ sub main_ebook {
       copy( $o{f}, $f_e );
       $msg = decode( locale => $o{f} );
     }
-  } else {
+  } elsif($o{u}) {
     my $info = decode( locale => `get_novel.pl -u "$o{u}" -D 1` );
     chomp( $info );
     my ( $writer, $book, $url, $chap_num ) = split ',', $info;
     $f_e = get_ebook( $o{u}, $writer, $book, %o );
     $msg = "$writer 《$book》 $chap_num   $url";
+  }else {
+    $f_e = get_ebook( undef, $o{w}, $o{b}, %o );
+    $msg = "$o{s} : $o{w} 《$o{b}》";
   }
 
   send_ebook( $f_e, $msg, %o ) if ( $o{t} );
@@ -68,11 +71,13 @@ sub get_ebook {
 
   #conv txt to html / get novel to html
   my ( $fh, $html_f ) = tempfile( "run_novel-html-XXXXXXXXXXXXXX", TMPDIR => 1, SUFFIX => ".html" );
-  if ( -f $src ) {
+  if ( $src and -f $src ) {
     my $s = decode( locale => $src );
     system( encode( locale => qq[get_novel.pl -f "$s" -w "$writer" -b "$book" -o $html_f $o{G}] ) );
+  } elsif($src) {
+    system( encode( locale => qq[get_novel.pl -u "$src" -w "$writer" -b "$book" -o $html_f $o{G}] ) );
   } else {
-    system( encode( locale => qq[get_novel.pl -u "$src" -o $html_f $o{G}] ) );
+    system( encode( locale => qq[get_novel.pl -s "$o{s}" -w "$writer" -b "$book" -o $html_f $o{G}] ) );
   }
 
   $o{o}=~s#/?$##;
