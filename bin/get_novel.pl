@@ -77,5 +77,7 @@ if ( $opt{f} ) {
   } else {
     $xs->get_item( $opt{u}, %opt_out );
   }
+} elsif ($opt{s} and $opt{w} and $opt{b}){
+    $xs->get_item( "$opt{w}:$opt{b}", %opt_out );
 }
 

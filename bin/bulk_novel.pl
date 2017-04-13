@@ -35,7 +35,7 @@ for my $r ( @$items_ref ) {
   if ( $opt_out{not_download} ) {
     print join( ",", $r->{writer} || $info, $r->{book} || $r->{title}, $r->{url} ), "\n";
   } else {
-    $xs->get_item( $u, %opt_out );
+    $xs->get_item( $u, %$r, %opt_out );
   }
 }
 
