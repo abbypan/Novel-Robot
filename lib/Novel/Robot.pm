@@ -44,11 +44,12 @@ sub get_item {
 
     my $item_ref = $self->{parser}->get_item_ref( $index_url, %o );
 
-    my $last_floor_num = $item_ref->{raw_floor_num}  || $item_ref->{floor_list}[-1]{id};
+    my $last_floor_num = $item_ref->{chapter_num} || $item_ref->{floor_num};
     print "last_floor_num: $last_floor_num\n" if ( $o{verbose} );
 
     return unless ($item_ref);
     return unless(@{$item_ref->{floor_list}});
+    return unless(grep { $_->{content} } @{$item_ref->{floor_list}});
 
     $self->{packer}->format_item_output( $item_ref, \%o );
     my $r = $self->{packer}->main( $item_ref, %o );
