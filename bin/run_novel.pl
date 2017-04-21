@@ -62,7 +62,7 @@ sub main_ebook {
     $msg = "$o{s} : $o{w} 《$o{b}》";
   }
 
-  send_ebook( $f_e, $msg, %o ) if ( $o{t} );
+  send_ebook( $f_e, $msg, %o ) if ( $o{t} and -f $f_e );
   return $f_e;
 } ## end sub main_ebook
 
@@ -84,6 +84,8 @@ sub get_ebook {
   my $ebook_f = ($o{o} and -d $o{o}) ? "$o{o}/$writer-$book.$o{T}" : 
                 $o{o} ? $o{o} : "$writer-$book.$o{T}";
   my ( $type ) = $ebook_f =~ /\.([^.]+)$/;
+
+  return unless(-f $html_f and -s $html_f);
 
   #conv html to ebook
   my ( $fh_e, $f_e ) = $o{t}
