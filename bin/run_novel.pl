@@ -62,7 +62,7 @@ sub main_ebook {
     $msg = "$o{s} : $o{w} 《$o{b}》";
   }
 
-  send_ebook( $f_e, $msg, %o ) if ( $o{t} and -f $f_e );
+  send_ebook( $f_e, $msg, %o ) if ( $o{t} and $f_e and -f $f_e );
   return $f_e;
 } ## end sub main_ebook
 
