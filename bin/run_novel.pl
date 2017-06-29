@@ -41,8 +41,8 @@ sub main_ebook {
     if ( $o{f} =~ /\.txt/i ) {
       my $fname = decode( locale => $o{f} );
       my ( $writer, $book ) = $fname =~ /([^\\\/]+?)-([^\\\/]+?)\.[^.\\\/]+$/;
-      $o{w} //= $writer;
-      $o{b} //= $book;
+      $o{w} ||= $writer;
+      $o{b} ||= $book;
       $f_e = get_ebook( $o{f}, $o{w}, $o{b}, %o );
       $msg = "$o{w} 《$o{b}》";
     } else {
