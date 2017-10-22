@@ -73,7 +73,7 @@ if ( $opt{f} ) {
 } elsif ( $opt{u} ) {
   if ( $opt{D} ) {
     my $r = $xs->{parser}->get_item_info( $opt{u}, %opt_out, max_page_num => 1 );
-    print join( ",", $r->{writer} || '', $r->{book} || $r->{title} || '', $r->{url} || '', $r->{chapter_num} || '' ), "\n";
+    print join( ",", $r->{writer} || '', $r->{book} || $r->{title} || '', $r->{url} || '', $r->{floor_num} || '' ), "\n";
   } else {
     $xs->get_item( $opt{u}, %opt_out );
   }
