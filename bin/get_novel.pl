@@ -34,7 +34,7 @@ sub read_option {
     type => $opt{t} || 'html',
     output   => $opt{o},
     with_toc => $opt{C} // 1,
-    cookie => $opt{c} || undef;
+    cookie => $opt{c} || undef,
 
     grep_content   => $opt{G} ? decode( locale => $opt{G} ) : undef,
     filter_content => $opt{F} ? decode( locale => $opt{F} ) : undef,

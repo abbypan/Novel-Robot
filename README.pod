@@ -107,8 +107,8 @@ download novel from url
 
 下载小说
 
-    get_novel.pl -u [url] -t [type] -i [min_item_num-max_item_num] -o [dst_file/dst_dir]
-    get_novel.pl -u [小说目录页url] -t [目标文件类型] -i [起止章节号] -o [目标文件名/目标文件夹]
+    get_novel.pl -u [url] -t [type] -i [min_item_num-max_item_num] -c [cookie] -o [dst_file/dst_dir]
+    get_novel.pl -u [小说目录页url] -t [目标文件类型] -i [起止章节号] -c [cookie登录信息] -o [目标文件名/目标文件夹]
 
     get_novel.pl -u "http://www.jjwxc.net/onebook.php?novelid=14838" -t txt
     get_novel.pl -u "http://www.jjwxc.net/onebook.php?novelid=14838" -t html
@@ -118,6 +118,10 @@ download novel from url
     get_novel.pl -u "http://www.jjwxc.net/onebook.php?novelid=14838" -t html -i 3-4
     get_novel.pl -u "http://www.jjwxc.net/onebook.php?novelid=14838" -t html -i 3-
     get_novel.pl -u "http://www.jjwxc.net/onebook.php?novelid=14838" -t html -i -3
+
+    get_novel.pl -u "http://www.jjwxc.net/onebook.php?novelid=217747" -i 33-34 -c cookies.txt
+    get_novel.pl -u "http://www.jjwxc.net/onebook.php?novelid=217747" -i 33-34 -c ~/.mozilla/firefox/*/cookies.sqlite
+    get_novel.pl -u "http://www.jjwxc.net/onebook.php?novelid=217747" -i 33-34 -c "name1=value1; name2=value2"
 
 =head2 convert txt
 
@@ -148,6 +152,7 @@ only print info, but not download, 输出小说信息（不下载）
     -b : book name，书名
     -f : txt file / txt file dir, 指定文本文件来源(可以是单个目录或文件)
     -R : chapter regex, 指定分割章节的正则表达式(例如："第[ \\t\\d]+章")
+    -c : firefox cookies.sqlite / netscape HTTP cookie file / cookie string, details in Novel::Robot::Browser
 
     -t : save type, 小说保存类型，例如txt/html
     -o : output filename, 保存的小说文件名
