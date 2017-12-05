@@ -14,7 +14,7 @@ binmode( STDOUT, ":encoding(console_out)" );
 binmode( STDERR, ":encoding(console_out)" );
 
 my %opt;
-getopt( 'sufwbRtoCGFANDpviP', \%opt );
+getopt( 'sufwbRtoCGFANDpviPc', \%opt );
 
 my %opt_out = read_option( %opt );
 
@@ -34,6 +34,7 @@ sub read_option {
     type => $opt{t} || 'html',
     output   => $opt{o},
     with_toc => $opt{C} // 1,
+    cookie => $opt{c} || undef;
 
     grep_content   => $opt{G} ? decode( locale => $opt{G} ) : undef,
     filter_content => $opt{F} ? decode( locale => $opt{F} ) : undef,
@@ -66,6 +67,10 @@ sub read_option {
 } ## end sub read_option
 
 our $xs = Novel::Robot->new( type => $opt_out{type}, site => $opt_out{site} );
+if($opt{c}){
+    my ($dom, $base_dom) = $xs->{parser}->detect_domain($opt{u} || $xs->{parser}->domain());
+    $xs->{browser}->read_moz_cookie($opt{c}, $base_dom);
+}
 
 if ( $opt{f} ) {
   my @path = split ',', $opt{f};
