@@ -16,17 +16,18 @@ binmode( STDERR, ":encoding(console_out)" );
 
 my %opt;
 GetOptions(
-  \%opt,
-  'site|s=s', 'url|u=s', 'file|f=s', 'writer|w=s', 'book|b=s',
-  'type|t=s', 'output|o=s',
-  'item|i=s', 'page|p=s', 'cookie|c=s',
+    \%opt,
+    'site|s=s', 'url|u=s', 'file|f=s', 'writer|w=s', 'book|b=s',
+    'type|t=s', 'output|o=s',
+    'chapter_regex|r=s', 
+    'item|i=s', 'page|p=s', 'cookie|c=s',
 
-  'with_toc|C', 'grep_content|G=s', 'filter_content|F=s', 'only_poster|A', 'min_content_word_num|N=i',
+    'with_toc|C', 'grep_content|G=s', 'filter_content|F=s', 'only_poster|A', 'min_content_word_num|N=i',
 
-  'not_download|D', 'max_process_num|P=i', 'verbose|v',
+    'not_download|D', 'max_process_num|P=i', 'verbose|v',
 
-  'content_path=s',  'writer_path=s',  'book_path=s', 'novel_list_path=s',
-  'content_regex=s', 'writer_regex=s', 'book_regex=s',
+    'content_path=s',  'writer_path=s',  'book_path=s', 'novel_list_path=s',
+    'content_regex=s', 'writer_regex=s', 'book_regex=s',
 );
 
 %opt = read_option( %opt );
@@ -62,6 +63,7 @@ sub read_option {
 
   for my $k (
     qw/writer writer_path writer_regex book book_path book_regex content_path content_regex novel_list_path
+    chapter_regex
     grep_content filter_content
     /
     ) {
