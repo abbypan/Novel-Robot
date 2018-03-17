@@ -55,6 +55,8 @@ sub main_ebook {
     my $info = decode( locale => `get_novel.pl -u "$o{u}" -D 1` );
     chomp( $info );
     my ( $writer, $book, $url, $chap_num ) = split ',', $info;
+    $writer = $o{w} if($o{w});
+    $book = $o{b} if($o{b});
     $f_e = get_ebook( $o{u}, $writer, $book, %o );
     $msg = "$writer 《$book》 $chap_num   $url";
   }else {
