@@ -107,8 +107,8 @@ download novel from url
 
 下载小说
 
-    get_novel.pl -u [url] -t [type] -i [min_item_num-max_item_num] -c [cookie] -o [dst_file/dst_dir]
-    get_novel.pl -u [小说目录页url] -t [目标文件类型] -i [起止章节号] -c [cookie登录信息] -o [目标文件名/目标文件夹]
+    get_novel.pl -u [url] -t [type] -i [min_item_num-max_item_num] --cookie [cookie] -o [dst_file/dst_dir]
+    get_novel.pl -u [小说目录页url] -t [目标文件类型] -i [起止章节号] --cookie [cookie登录信息] -o [目标文件名/目标文件夹]
 
     get_novel.pl -u "http://www.jjwxc.net/onebook.php?novelid=14838" -t txt
     get_novel.pl -u "http://www.jjwxc.net/onebook.php?novelid=14838" -t html
@@ -119,9 +119,11 @@ download novel from url
     get_novel.pl -u "http://www.jjwxc.net/onebook.php?novelid=14838" -t html -i 3-
     get_novel.pl -u "http://www.jjwxc.net/onebook.php?novelid=14838" -t html -i -3
 
-    get_novel.pl -u "http://www.jjwxc.net/onebook.php?novelid=217747" -i 33-34 -c cookies.txt
-    get_novel.pl -u "http://www.jjwxc.net/onebook.php?novelid=217747" -i 33-34 -c ~/.mozilla/firefox/*/cookies.sqlite
-    get_novel.pl -u "http://www.jjwxc.net/onebook.php?novelid=217747" -i 33-34 -c "name1=value1; name2=value2"
+jjwxc vip: 可以使用firefox浏览器，先登录m.jjwxc.net，然后用[cookies.txt](https://addons.mozilla.org/zh-CN/firefox/addon/cookies-txt/)扩展导出cookies.txt，则可以下载当前登录账号所购买的小说；也可直接指定firefox配置目录下的cookies.sqlite文件；或者直接使用m.jjwxc.net的cookie字符串
+
+    get_novel.pl -u "http://www.jjwxc.net/onebook.php?novelid=217747" -i 33-34 --cookie cookies.txt
+    get_novel.pl -u "http://www.jjwxc.net/onebook.php?novelid=217747" -i 33-34 --cookie ~/.mozilla/firefox/*/cookies.sqlite
+    get_novel.pl -u "http://www.jjwxc.net/onebook.php?novelid=217747" -i 33-34 --cookie "name1=value1; name2=value2"
 
 =head2 convert txt
 

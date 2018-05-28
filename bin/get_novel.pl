@@ -35,7 +35,7 @@ GetOptions(
 #our $xs = Novel::Robot->new( type => $opt{type}, site => $opt{site} );
 our $xs = Novel::Robot->new( %opt );
 if ( $opt{cookie} ) {
-  my ( $dom, $base_dom ) = $xs->{parser}->detect_domain( $opt{url} || $xs->{parser}->domain() );
+  my ( $dom, $base_dom ) = $xs->{parser}->detect_domain( $xs->{parser}->domain() || $opt{url} );
   $xs->{browser}->read_moz_cookie( $opt{cookie}, $base_dom );
 }
 
