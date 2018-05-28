@@ -119,7 +119,7 @@ download novel from url
     get_novel.pl -u "http://www.jjwxc.net/onebook.php?novelid=14838" -t html -i 3-
     get_novel.pl -u "http://www.jjwxc.net/onebook.php?novelid=14838" -t html -i -3
 
-jjwxc vip: 可以使用firefox浏览器，先登录m.jjwxc.net，然后用 [cookies.txt](https://addons.mozilla.org/zh-CN/firefox/addon/cookies-txt/) 扩展导出cookies.txt，则可以下载当前登录账号所购买的小说；也可直接指定firefox配置目录下的cookies.sqlite文件；或者直接使用m.jjwxc.net的cookie字符串
+jjwxc vip: 可以使用firefox浏览器，先登录m.jjwxc.net，然后用 L<cookies.txt|https://addons.mozilla.org/zh-CN/firefox/addon/cookies-txt/> 扩展导出cookies.txt，则可以下载当前登录账号所购买的小说；也可直接指定firefox配置目录下的cookies.sqlite文件；或者直接使用m.jjwxc.net的cookie字符串
 
     get_novel.pl -u "http://www.jjwxc.net/onebook.php?novelid=217747" -i 33-34 --cookie cookies.txt
     get_novel.pl -u "http://www.jjwxc.net/onebook.php?novelid=217747" -i 33-34 --cookie ~/.mozilla/firefox/*/cookies.sqlite
