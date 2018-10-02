@@ -82,6 +82,11 @@ sub get_ebook {
     system( encode( locale => qq[get_novel.pl -s "$o{s}" -w "$writer" -b "$book" -o $html_f $o{G}] ) );
   }
 
+  my $min_id='';
+  if($o{G} and ($min_id) = $o{G}=~m#-i\s+(\d+)-#){
+      $book.="-$min_id" if($min_id and $min_id>1);
+  }
+
   $o{o}=~s#/?$##;
   my $ebook_f = ($o{o} and -d $o{o}) ? "$o{o}/$writer-$book.$o{T}" : 
                 $o{o} ? $o{o} : "$writer-$book.$o{T}";
