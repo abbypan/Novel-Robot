@@ -67,3 +67,9 @@ sub split_index {
 }
 
 1;
+
+=head1 NAME
+
+Novel::Robot - Download novel /bbs thread
+
+=cut
