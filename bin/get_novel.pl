@@ -26,6 +26,7 @@ GetOptions(
 
     'not_download|D', 'max_process_num|P=i', 'verbose|v',
 
+    'use_chrome', 
     'content_path=s',  'writer_path=s',  'book_path=s', 'novel_list_path=s',
     'content_regex=s', 'writer_regex=s', 'book_regex=s',
 );

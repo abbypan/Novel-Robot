@@ -119,6 +119,10 @@ download novel from url
     get_novel.pl -u "http://www.jjwxc.net/onebook.php?novelid=14838" -t html -i 3-
     get_novel.pl -u "http://www.jjwxc.net/onebook.php?novelid=14838" -t html -i -3
 
+use chrome to parse dom: (飘灯-青春期妖怪.html)
+
+    get_novel.pl -u "https://www.aliwx.com.cn/chapter?bid=7964189" --use_chrome --writer_path "//div[@class='chapterbox']//span" --book_regex "<title>(.+?)-阿里文学网" --content_path "//div[@class='chapter-content']"
+
 jjwxc vip: 可以使用firefox浏览器，先登录m.jjwxc.net，然后用 L<cookies.txt|https://addons.mozilla.org/zh-CN/firefox/addon/cookies-txt/> 扩展导出cookies.txt，则可以下载当前登录账号所购买的小说；也可直接指定firefox配置目录下的cookies.sqlite文件；或者直接使用m.jjwxc.net的cookie字符串
 
     get_novel.pl -u "http://www.jjwxc.net/onebook.php?novelid=217747" -i 33-34 --cookie cookies.txt
@@ -175,6 +179,8 @@ only print info, but not download, 输出小说信息（不下载）
     --content_regex   : regex to extract content, 提取content的正则
     --writer_regex    : regex to extract writer, 提取writer的正则
     --book_regex      : regex to extract book, 提取book的正则
+
+    --use_chrome      : use chrome dump_dom, only support GET method
 
     -D : only print info, not download, 只输出信息，不下载
     -v : verbose, 显示进度条(默认显示)

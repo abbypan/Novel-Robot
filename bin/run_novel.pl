@@ -10,11 +10,14 @@ use File::Copy;
 use Getopt::Std;
 use Novel::Robot;
 use POSIX qw/ceil/;
+use FindBin;
 
 $| = 1;
 binmode( STDIN,  ":encoding(console_in)" );
 binmode( STDOUT, ":encoding(console_out)" );
 binmode( STDERR, ":encoding(console_out)" );
+
+our $GET_NOVEL = "$FindBin::RealBin/get_novel.pl ";
 
 my %opt;
 getopt( 'sfwbutTGCSoh', \%opt );
@@ -52,7 +55,7 @@ sub main_ebook {
       $msg = decode( locale => $o{f} );
     }
   } elsif($o{u}) {
-    my $info = decode( locale => `get_novel.pl -u "$o{u}" -D 1` );
+    my $info = decode( locale => `$GET_NOVEL -u "$o{u}" -D 1` );
     chomp( $info );
     my ( $writer, $book, $url, $chap_num ) = split ',', $info;
     $writer = $o{w} if($o{w});
@@ -75,11 +78,11 @@ sub get_ebook {
   my ( $fh, $html_f ) = tempfile( "run_novel-html-XXXXXXXXXXXXXX", TMPDIR => 1, SUFFIX => ".html" );
   if ( $src and -f $src ) {
     my $s = decode( locale => $src );
-    system( encode( locale => qq[get_novel.pl -f "$s" -w "$writer" -b "$book" -o $html_f $o{G}] ) );
+    system( encode( locale => qq[$GET_NOVEL -f "$s" -w "$writer" -b "$book" -o $html_f $o{G}] ) );
   } elsif($src) {
-    system( encode( locale => qq[get_novel.pl -u "$src" -w "$writer" -b "$book" -o $html_f $o{G}] ) );
+    system( encode( locale => qq[$GET_NOVEL -u "$src" -w "$writer" -b "$book" -o $html_f $o{G}] ) );
   } else {
-    system( encode( locale => qq[get_novel.pl -s "$o{s}" -w "$writer" -b "$book" -o $html_f $o{G}] ) );
+    system( encode( locale => qq[$GET_NOVEL -s "$o{s}" -w "$writer" -b "$book" -o $html_f $o{G}] ) );
   }
 
   my $min_id='';
