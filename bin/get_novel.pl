@@ -19,14 +19,13 @@ GetOptions(
     \%opt,
     'site|s=s', 'url|u=s', 'file|f=s', 'writer|w=s', 'book|b=s',
     'type|t=s', 'output|o=s',
-    'chapter_regex|r=s', 
     'item|i=s', 'page|p=s', 'cookie|c=s',
-
-    'with_toc|C', 'grep_content|G=s', 'filter_content|F=s', 'only_poster|A', 'min_content_word_num|N=i',
-
-    'not_download|D', 'max_process_num|P=i', 'verbose|v',
+    'not_download|D', 'verbose|v',
 
     'use_chrome', 
+    'with_toc', 'grep_content=s', 'filter_content=s', 'only_poster', 'min_content_word_num=i',
+    'max_process_num=i', 
+    'chapter_regex=s', 
     'content_path=s',  'writer_path=s',  'book_path=s', 'novel_list_path=s',
     'content_regex=s', 'writer_regex=s', 'book_regex=s',
 );

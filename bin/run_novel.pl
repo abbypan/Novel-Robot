@@ -11,6 +11,7 @@ use Getopt::Std;
 use Novel::Robot;
 use POSIX qw/ceil/;
 use FindBin;
+use Data::Dumper;
 
 $| = 1;
 binmode( STDIN,  ":encoding(console_in)" );
@@ -107,7 +108,7 @@ sub get_ebook {
     : ( '', $ebook_f );
   print "conv to ebook $f_e\n";
   if ( $type ne 'html' ) {
-    system( encode( locale => qq[conv_novel.pl -f "$html_f" -t "$f_e" -w "$writer" -b "$book" $o{C}] ) );
+    system( encode( locale => qq[conv_novel.pl -f "$html_f" -T "$f_e" -w "$writer" -b "$book" $o{C}] ) );
     unlink( $html_f );
   } else {
     rename( $html_f, $f_e );
