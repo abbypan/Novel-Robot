@@ -178,7 +178,7 @@ only print info, but not download, 输出小说信息（不下载）
     --max_process_num : 进程个数 
     --chapter_regex: 指定分割章节的正则表达式(例如："第[ \\t\\d]+章")
 
-    --novel_list_path : xpath to extract novel_list, 提取novel_list的路径
+    --item_list_path : xpath to extract item_list, 提取item_list的路径
     --content_path    : xpath to extract content, 提取content的路径
     --writer_path     : xpath to extract writer, 提取writer的路径
     --book_path       : xpath to extract book, 提取book的路径
@@ -279,17 +279,17 @@ set dst type, 设置打包引擎
 
     $xs->set_packer('html');
 
-=head2 get_item 
+=head2 get_novel 
 
 download one novel/thread 下载整本小说
 
     $xs->set_parser('jjwxc');
     my $index_url = 'http://www.jjwxc.net/onebook.php?novelid=2456';
-    $xs->get_item($index_url);
+    $xs->get_novel($index_url);
 
 
     $xs->set_parser('txt');
-    $xs->get_item([ '/somepath/somefile.txt' ]
+    $xs->get_novel([ '/somepath/somefile.txt' ]
             writer => '牵机', book => '断情逐妖记', 
             );
 
@@ -297,23 +297,65 @@ download one novel/thread 下载整本小说
 
 bulk download writer's novel 下载作者专栏
 
-    $xs->set_parser('jjwxc');
+    #!/usr/bin/perl   
+    use strict;
+    use warnings;
+    use utf8;
+
+    use Novel::Robot;
+    use Data::Dumper;
+    use Encode::Locale;
+    use Encode;
+
+    my $xs = Novel::Robot->new();
+
+    $xs->set_parser( 'jjwxc' );
+    $xs->set_packer( 'html' );
+
     my $writer_url = 'http://www.jjwxc.net/oneauthor.php?authorid=14644';
-    my ($writer_name, $books_ref) = $xs->{parser}->get_board_ref($writer_url, %opt);
-    $xs->get_item($_, %opt) for @$books_ref;
+    my $writer_ref = $xs->{parser}->get_iterate_ref(
+      $writer_url,
+        info_sub => sub {
+                $xs->{parser}->extract_elements(
+                      @_,
+                            sub => $xs->{parser}->can( "parse_board" ),
+                                );
+                  },
+                    item_list_sub => sub { $xs->{parser}->can( "parse_board_item" )->( $xs->{parser}, @_ ) },
+                    );
 
-bulk download board's threads 下载版块
+    print encode( locale => "$writer_ref->{writer},$_->{book},$_->{url}\n" ) for @{ $writer_ref->{item_list} };
 
-    $xs->set_parser('hjj');
-    my $board_url = "http://bbs.jjwxc.net/showmsg.php?board=153";
-    my ($info, $tiezis_ref) = $xs->{parser}->get_board_ref($board_url, %opt);
-    $xs->get_item($_, %opt) for @$tiezis_ref;
+    print "\nstart download\n";
+    $xs->get_novel( $_->{url} ) for @{ $writer_ref->{item_list} };
 
-query novels/threads 查询关键字并下载
+bulk download query novel 下载查询结果
 
-    my $query_type = '作者';
-    my $query_keyword='牵机';
-    my ($info, $items_ref) = $xs->{parser}->get_query_ref($query_keyword, query_type => $query_type, %opt);
-    $xs->get_item($_, %opt) for @$items_ref;
+    #!/usr/bin/perl   
+    use strict;
+    use warnings;
+    use utf8;
+
+    use Novel::Robot;
+    use Data::Dumper;
+    use Encode::Locale;
+    use Encode;
+
+    my $xs = Novel::Robot->new();
+
+    $xs->set_parser( 'jjwxc' );
+    $xs->set_packer( 'html' );
+
+    my $keyword = '断情逐妖记';
+    my $query_url = $xs->{parser}->make_query_request($keyword, query_type =>  '作品');
+    my $query_ref = $xs->{parser}->get_iterate_ref(
+      $query_url,
+        info_sub => sub { return {}; },
+          item_list_sub => sub { $xs->{parser}->can( "parse_query_item" )->( $xs->{parser}, @_ ) },
+          );
+    print encode( locale => "$_->{writer},$_->{book},$_->{url}\n" ) for @{ $query_ref->{item_list} };
+
+    print "\nonly download first\n";
+    $xs->get_novel( $_->{url} ) for @{ $query_ref->{item_list} }[0];
 
 =cut

@@ -26,7 +26,7 @@ GetOptions(
     'with_toc', 'grep_content=s', 'filter_content=s', 'only_poster', 'min_content_word_num=i',
     'max_process_num=i', 
     'chapter_regex=s', 
-    'content_path=s',  'writer_path=s',  'book_path=s', 'novel_list_path=s',
+    'content_path=s',  'writer_path=s',  'book_path=s', 'item_list_path=s',
     'content_regex=s', 'writer_regex=s', 'book_regex=s',
 );
 
@@ -41,16 +41,16 @@ if ( $opt{cookie} ) {
 
 if ( $opt{file} ) {
   my @path = split ',', $opt{file};
-  $xs->get_item( \@path, %opt );
+  $xs->get_novel( \@path, %opt );
 } elsif ( $opt{url} ) {
   if ( $opt{not_download} ) {
-    my $r = $xs->{parser}->get_item_info( $opt{url}, %opt, max_page_num => 1 );
-    print join( ",", $r->{writer} || '', $r->{book} || $r->{title} || '', $r->{url} || '', $r->{floor_num} || '' ), "\n";
+    my $r = $xs->{parser}->get_novel_info( $opt{url}, %opt, max_page_num => 1 );
+    print join( ",", $r->{writer} || '', $r->{book} || $r->{title} || '', $r->{url} || '', $r->{item_num} || '' ), "\n";
   } else {
-    $xs->get_item( $opt{url}, %opt );
+    $xs->get_novel( $opt{url}, %opt );
   }
 } elsif ( $opt{site} and $opt{writer} and $opt{book} ) {
-  $xs->get_item( "$opt{writer}:$opt{book}", %opt );
+  $xs->get_novel( "$opt{writer}:$opt{book}", %opt );
 }
 
 sub read_option {
@@ -62,7 +62,7 @@ sub read_option {
   $opt{verbose}         //= 1;
 
   for my $k (
-    qw/writer writer_path writer_regex book book_path book_regex content_path content_regex novel_list_path
+    qw/writer writer_path writer_regex book book_path book_regex content_path content_regex item_list_path
     chapter_regex
     grep_content filter_content
     /
