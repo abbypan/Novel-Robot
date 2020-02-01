@@ -44,7 +44,7 @@ sub get_item {
 
     my $item_ref = $self->{parser}->get_item_ref( $index_url, %o );
 
-    my $last_floor_num = $item_ref->{floor_num} || scalar(@{$item_ref->{floor_list}});
+    my $last_floor_num = $item_ref->{floor_list}[-1]{id} || $item_ref->{floor_num} || scalar(@{$item_ref->{floor_list}});
     print "last_floor_num: $last_floor_num\n" if ( $o{verbose} );
 
     return unless ($item_ref);
