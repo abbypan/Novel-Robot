@@ -83,7 +83,7 @@ sub get_tiezi_ref {
     $b =~ s/(..)/%$1/g;
 
     my %iter_opt = (
-        verbose              => 1,
+        #verbose              => 1,
         %opt, 
         reverse_item_list => 1,
         info_sub             => sub { { writer => $opt{writer}, book => $opt{book}, title => $opt{book} } },

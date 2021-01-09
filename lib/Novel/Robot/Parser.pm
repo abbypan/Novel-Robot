@@ -32,7 +32,7 @@ our %NULL_INDEX = (
   book       => '',
   writer     => '',
   writer_url => '',
-  item_list => [],
+  item_list  => [],
 
   intro    => '',
   series   => '',
@@ -106,7 +106,6 @@ sub generate_novel_url {
   return ( $index_url, @args );
 }
 
-
 ### }}}
 
 ### {{{ novel
@@ -158,7 +157,7 @@ sub get_novel_ref {
       %o,
     );
 
-    $r->{url}        = $index_url;
+    $r->{url}       = $index_url;
     $r->{item_list} = $item_list || [];
 
     #$r->{item_num}  = $max_item_num || undef;
@@ -445,7 +444,7 @@ sub get_tiezi_ref {
     %$topic,
     writer => $o{writer} || $topic->{writer},
     book   => $o{book}   || $topic->{book} || $topic->{title},
-    url        => $url,
+    url       => $url,
     item_list => $item_list,
   );
   $self->filter_item_list( \%r, %o );
@@ -460,16 +459,16 @@ sub get_iterate_ref {
   my ( $self, $url, %o ) = @_;
   my ( $info, $item_list ) = $self->{browser}->request_url_whole(
     $url,
-    post_data     => $o{post_data},
-    info_sub => sub {
+    post_data => $o{post_data},
+    info_sub  => sub {
       $self->extract_elements(
         @_,
-        path => { },
-        sub  => sub { my ($self, $html_ref, $r) = @_; return $r; }, 
+        path => {},
+        sub  => sub { my ( $self, $html_ref, $r ) = @_; return $r; },
       );
     },
-    item_sub      => sub { my ($self, $html_ref) = @_; return {}; }, 
-    item_list_sub => sub { my ($self, $html_ref) = @_; return []; }, 
+    item_sub      => sub { my ( $self, $html_ref ) = @_; return {}; },
+    item_list_sub => sub { my ( $self, $html_ref ) = @_; return []; },
 
     #min_page_num  => $o{"min_page_num"},
     #max_page_num  => $o{"max_page_num"},
@@ -483,7 +482,7 @@ sub get_iterate_ref {
   $info->{item_list} = $self->update_item_list( $item_list, $url );
 
   return $info;
-} ## end sub get_iterate_data
+} ## end sub get_iterate_ref
 
 ### }}}
 
@@ -685,10 +684,10 @@ sub unescape_js {
 }
 
 sub encode_cjk_for_url {
-    my ($self, $key) = @_;
-    my $b = uc( unpack( "H*", encode( $self->charset(), $key ) ) );
-    $b =~ s/(..)/%$1/g;
-    return $b;
+  my ( $self, $key ) = @_;
+  my $b = uc( unpack( "H*", encode( $self->charset(), $key ) ) );
+  $b =~ s/(..)/%$1/g;
+  return $b;
 }
 
 ### }}}
