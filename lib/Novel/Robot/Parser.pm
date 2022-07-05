@@ -268,8 +268,11 @@ sub parse_item_list {
 sub guess_item_list {
   my ( $self, $h, %opt ) = @_;
 
+  my $new_h = $$h;
+  $new_h=~s#<dt>[^<]+最新\d+章节</dt>.+?<dt>#<dt>#s;
+
   my $tree = HTML::TreeBuilder->new();
-  $tree->parse( $$h );
+  $tree->parse( $new_h );
 
   my @links = $tree->look_down( '_tag', 'a' );
   @links = grep { $_->attr( 'href' ) } @links;
@@ -335,7 +338,12 @@ sub guess_item_list {
   #sort chapter url
   if ( $res_arr and $res_arr->[0]{url} =~ /$chap_num_regex/ ) {
     my $trim_sub    = sub { my $s = $_[0]; $s =~ s/^.+\///; $s =~ s/\.html$//; return $s };
-    my @sort_arr    = sort { $trim_sub->( $a->{url} ) <=> $trim_sub->( $b->{url} ) } grep { $_->{url} =~ /$chap_num_regex/ } @$res_arr;
+    my @sort_arr;
+    if($opt{sort_chapter_url}){
+        @sort_arr = sort { $trim_sub->( $a->{url} ) <=> $trim_sub->( $b->{url} ) } grep { $_->{url} =~ /$chap_num_regex/ } @$res_arr;
+    }else{
+        @sort_arr = @$res_arr;
+    }
     my @s           = map { $trim_sub->( $_->{url} ) } @sort_arr;
     my $random_sort = 0;
     for my $i ( 0 .. $#s - 1 ) {
@@ -397,11 +405,13 @@ sub guess_novel_item {
   }
 
   #my @grep_next_r = grep { $_->{content} =~ /(上|下)一(章|页|篇)\w{0,20}$/s and $_->{word_num} > 50 } @out_links;
-  my @grep_next_r = grep { $_->{content} =~ /(上|下)一(章|页|篇)/s and $_->{word_num} > 50 } @out_links;
+  my @grep_next_r = grep { $_->{content} =~ /(上|下)一(章|页|篇)/s 
+          and $_->{word_num} > 50 
+  } @out_links;
 
   my $cc   = $no_next_r->{content};
   my $cc_n = $cc =~ s/(\n|<p[^>]*>|<br[^>]*>)//sg;
-  return $no_next_r if ( ( $cc_n > 5 and $no_next_r->{word_num} > 50 ) or !@grep_next_r );
+  return $no_next_r if ( ( $cc_n > 5 and $no_next_r->{word_num} > 50) or !@grep_next_r );
 
   return $grep_next_r[-1] || {};
 } ## end sub guess_novel_item
@@ -491,25 +501,33 @@ sub get_iterate_ref {
 sub update_item_list {
   my ( $self, $arr, $base_url ) = @_;
 
-  my $i = 0;
   my %rem;
+  for my $chap (@$arr){
+      $chap = { url => $chap || '' } if ( ref( $chap ) ne 'HASH' );
+      if ( $chap->{url} ) {
+          $chap->{url} = $self->format_abs_url( $chap->{url}, $base_url );
+          $rem{ $chap->{url} }++;
+      }
+  }
+
+  my $i = 0;
   my @res;
   for my $chap ( @$arr ) {
-    $chap = { url => $chap || '' } if ( ref( $chap ) ne 'HASH' );
-
-    if ( $chap->{url} ) {
-      $chap->{url} = $self->format_abs_url( $chap->{url}, $base_url );
-
-      next if ( exists $rem{ $chap->{url} } );
-      $rem{ $chap->{url} } = 1;
-    }
-
-    ++$i;
-    $chap->{pid} //= $i;               #page id
-    $chap->{id}  //= $i;               #item id
-    push @res, $chap;
+      if($chap->{url} and $rem{ $chap->{url} }>1){
+          $rem{$chap->{url}}--;
+      }else{
+          ++$i;
+          $chap->{pid} //= $i;               #page id
+          $chap->{id}  //= $i;               #item id
+          push @res, $chap;
+      }
   }
-  $i = $arr->[-1]{id} if ( $#$arr >= 0 and exists $arr->[-1]{id} and $arr->[-1]{id} > $i );
+
+  while($res[-1]{content}=~m#正在手打中#s){
+      pop @res;
+  }
+
+  #$i = $arr->[-1]{id} if ( $#$arr >= 0 and exists $arr->[-1]{id} and $arr->[-1]{id} > $i );
   return wantarray ? ( \@res, $i ) : \@res;
 } ## end sub update_item_list
 

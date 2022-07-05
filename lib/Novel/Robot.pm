@@ -43,6 +43,10 @@ sub get_novel {
   return unless ( @{ $novel_ref->{item_list} } );
   return unless ( grep { $_->{content} } @{ $novel_ref->{item_list} } );
 
+  while( ! $novel_ref->{item_list}[-1]{content}){
+      pop @{$novel_ref->{item_list}};
+  }
+
   my $last_item_num =
     scalar( @{ $novel_ref->{item_list} } ) > 0
     ? $novel_ref->{item_list}[-1]{id}

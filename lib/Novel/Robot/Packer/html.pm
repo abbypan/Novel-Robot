@@ -37,7 +37,6 @@ sub process_template {
         <style type="text/css">
 body {
 	font-size: large;
-	font-family: Verdana, Arial, Helvetica, sans-serif;
 	margin: 1em 8em 1em 8em;
 	text-indent: 2em;
 	line-height: 145%;

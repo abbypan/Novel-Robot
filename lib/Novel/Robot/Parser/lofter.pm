@@ -26,7 +26,7 @@ sub extract_content {
       title => 'TEXT',
       url   => '@href'
       };
-    process '//a[@class="title"]',
+    process '//a[@class="title"] | //a[@class="readall"]',
       'chap[]' => {
       title => 'TEXT',
       url   => '@href'
