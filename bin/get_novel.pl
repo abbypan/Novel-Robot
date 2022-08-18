@@ -61,7 +61,7 @@ sub read_option {
   $opt{with_toc}        //= 1;
   $opt{term_progress_bar}        //= 0;
   $opt{max_process_num} //= 1;
-  $opt{verbose}         //= 1;
+  $opt{verbose}         //= 0;
 
   for my $k (
     qw/writer writer_path writer_regex book book_path book_regex content_path content_regex item_list_path

@@ -519,11 +519,12 @@ sub update_item_list {
           ++$i;
           $chap->{pid} //= $i;               #page id
           $chap->{id}  //= $i;               #item id
+          $chap->{content} //= '';
           push @res, $chap;
       }
   }
 
-  while($res[-1]{content}=~m#正在手打中#s){
+  while($res[-1]{content}=~m#正在手打中#s ){
       pop @res;
   }
 
