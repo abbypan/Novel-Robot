@@ -179,10 +179,10 @@ sub get_novel_ref {
 sub scrape_novel {
   my ( $self ) = @_;
   my $r = {};
-  $r->{book}{path}    = $self->{book_path}    if ( exists $self->{book_path} );
-  $r->{book}{regex}   = $self->{book_regex}   if ( exists $self->{book_regex} );
-  $r->{writer}{path}  = $self->{writer_path}  if ( exists $self->{writer_path} );
-  $r->{writer}{regex} = $self->{writer_regex} if ( exists $self->{writer_regex} );
+  push @{$r->{book}}, { path => $self->{book_path} } if ( exists $self->{book_path} );
+  push @{$r->{book}}, { regex => $self->{book_regex} } if ( exists $self->{book_regex} );
+  push @{$r->{writer}}, { path => $self->{writer_path} } if ( exists $self->{writer_path} );
+  push @{$r->{writer}}, { regex => $self->{writer_regex} } if ( exists $self->{writer_regex} );
   return $r;
 }
 
@@ -359,10 +359,12 @@ sub guess_item_list {
 sub scrape_novel_item {
   my ( $self ) = @_;
   my $r = {};
-  $r->{content}{path}  = $self->{content_path}  if ( exists $self->{content_path} );
-  $r->{content}{regex} = $self->{content_regex} if ( exists $self->{content_regex} );
-  $r = { content => { path => '//div[@id="content"]' } } unless ( exists $r->{content} );
-  $r->{content}{extract} ||= 'HTML' if ( exists $r->{content}{path} );
+  push @{$r->{content}}, { path => $self->{content_path}, extract => 'HTML' } if( exists $self->{content_path} );
+  push @{$r->{content}}, { regex => $self->{content_regex} } if( exists $self->{content_regex} );
+  push @{$r->{content}}, (
+      { path => '//div[@class="novel_content"]' }, 
+      { path => '//div[@id="content"]' }, 
+  );
   return $r;
 }
 
@@ -524,7 +526,7 @@ sub update_item_list {
       }
   }
 
-  while($res[-1]{content}=~m#正在手打中#s ){
+  while(@res and $res[-1]{content}=~m#正在手打中#s ){
       pop @res;
   }
 
@@ -545,7 +547,7 @@ sub extract_elements {
 
   my $r = {};
   while ( my ( $xk, $xr ) = each %{ $o{path} } ) {
-    $r->{$xk} = $self->scrape_element( $h, $xr );
+    $r->{$xk} = $self->scrape_element_try( $h, $xr );
   }
   $r = $o{sub}->( $self, $h, $r ) if ( $o{sub} );
   return $r;

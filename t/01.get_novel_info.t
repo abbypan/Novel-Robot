@@ -1,5 +1,5 @@
 #!/usr/bin/perl
-use lib '../lib';
+#use lib '../lib';
 use Novel::Robot::Parser;
 use Test::More;
 use Data::Dumper;
@@ -61,10 +61,10 @@ sub check_site {
   #print $xs->{browser}->request_url($r->{index_url});
   #exit;
 
-  my $index_ref = $xs->get_item_info( $r->{index_url} );
-  print scalar(@{$index_ref->{floor_list}}), "\n";
+  my $index_ref = $xs->get_novel_info( $r->{index_url} );
+  #print scalar(@{$index_ref->{item_list}}), "\n";
 
-  print $index_ref->{floor_list}[-1]{url},"\n";
+  #print $index_ref->{item_list}[-1]{url},"\n";
   #print Dumper($index_ref->{book});
   is( $index_ref->{book} =~ /$r->{book}/     ? 1 : 0, 1, "book" );
   is( $index_ref->{writer} =~ /$r->{writer}/ ? 1 : 0, 1, "writer" );
@@ -88,7 +88,7 @@ sub check_site {
     sub  => $xs->can( 'parse_novel_item' ),
   );
   is( $chapter_ref->{content} =~ /$r->{chapter_content}/ ? 1 : 0, 1, 'chapter_content' );
-  print join( ",", $index_ref->{book}, $index_ref->{writer}, $index_ref->{floor_list}[0]{title} ), "\n";
+  print join( ",", $index_ref->{book}, $index_ref->{writer}, $index_ref->{item_list}[0]{title} ), "\n";
 
   #print $chapter_ref->{content},"\n";
   print "---------\n\n";
