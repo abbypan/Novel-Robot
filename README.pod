@@ -113,7 +113,6 @@ download novel from url
 
     get_novel.pl -u "http://www.jjwxc.net/onebook.php?novelid=14838" -t txt
     get_novel.pl -u "http://www.jjwxc.net/onebook.php?novelid=14838" -t html
-    get_novel.pl -u "http://www.jjwxc.net/onebook.php?novelid=14838" -t web -o some_dir
 
     get_novel.pl -u "http://www.jjwxc.net/onebook.php?novelid=14838" -t html -i 3
     get_novel.pl -u "http://www.jjwxc.net/onebook.php?novelid=14838" -t html -i 3-4
