@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use utf8;
 
-our $VERSION = 0.22;
+#our $VERSION = 0.22;
 
 #use Novel::Robot::Browser::CookieJar;
 use HTTP::CookieJar;

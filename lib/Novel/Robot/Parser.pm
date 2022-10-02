@@ -14,7 +14,7 @@ use Data::Dumper;
 
 ### {{{ data
 
-our $VERSION = 0.32;
+#our $VERSION = 0.32;
 
 our %SITE_DOM_NAME = (
   'bbs.jjwxc.net'   => 'hjj',
@@ -326,9 +326,9 @@ sub guess_item_list {
   while ( 1 ) {
     my $x = $res_arr->[0];
     my $y = $res_arr->[ int( $#$res_arr / 2 ) ];
-    if ( $y->{title} =~ /$title_regex/ and $y->{url} =~ /\.html$/ and $x->{url} !~ /\.html$/ ) {
+    if ( defined $y->{title} and $y->{title} =~ /$title_regex/ and defined $y->{url} and $y->{url} =~ /\.html$/ and $x->{url} !~ /\.html$/ ) {
       shift( @$res_arr );
-    } elsif ( $y->{title} =~ /$title_regex/ and $y->{url} =~ /$chap_num_regex/ and $x->{url} !~ /$chap_num_regex/ ) {
+    } elsif ( defined $y->{title} and $y->{title} =~ /$title_regex/ and defined $y->{url} and $y->{url} =~ /$chap_num_regex/ and $x->{url} !~ /$chap_num_regex/ ) {
       shift( @$res_arr );
     } else {
       last;
@@ -336,7 +336,7 @@ sub guess_item_list {
   }
 
   #sort chapter url
-  if ( $res_arr and $res_arr->[0]{url} =~ /$chap_num_regex/ ) {
+  if ( $res_arr and defined $res_arr->[0]{url} and $res_arr->[0]{url} =~ /$chap_num_regex/ ) {
     my $trim_sub    = sub { my $s = $_[0]; $s =~ s/^.+\///; $s =~ s/\.html$//; return $s };
     my @sort_arr;
     if($opt{sort_chapter_url}){
@@ -522,7 +522,7 @@ sub update_item_list {
           $chap->{pid} //= $i;               #page id
           $chap->{id}  //= $i;               #item id
           $chap->{content} //= '';
-          push @res, $chap;
+          push @res, $chap  unless($chap->{content}=~m#正在手打中#s);
       }
   }
 

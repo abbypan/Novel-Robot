@@ -7,7 +7,7 @@ use utf8;
 use Novel::Robot::Parser;
 use Novel::Robot::Packer;
 
-our $VERSION = 0.40;
+our $VERSION = 0.42;
 
 sub new {
   my ( $self, %opt ) = @_;

@@ -5,7 +5,7 @@ use warnings;
 use Encode::Locale;
 use Encode;
 
-our $VERSION = 0.21;
+#our $VERSION = 0.21;
 
 sub new {
     my ( $self, %opt ) = @_;
