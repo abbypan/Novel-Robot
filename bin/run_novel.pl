@@ -87,7 +87,7 @@ sub get_ebook {
   }
 
   my $min_id='';
-  if($o{G} and ($min_id) = $o{G}=~m#-i\s+(\d+)-#){
+  if($o{G} and ($min_id) = $o{G}=~m#-i\s+['"]?(\d+)-#){
       $book.="-$min_id" if($min_id and $min_id>1);
   }
 
