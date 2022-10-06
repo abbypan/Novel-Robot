@@ -33,8 +33,8 @@ sub process_template {
 
         <head>
         <meta charset="UTF-8">
-        <dc:creator id="author">[% writer %]</dc:creator>
-        <dc:title id="title">[% writer %]</dc:title>
+        <meta property="opf.authors" content="[% writer %]">
+        <meta property="opf.titlesort" content="[% book %]">
         <title> [% writer %] 《 [% book %] 》</title>
         <style type="text/css">
 body {
@@ -57,7 +57,7 @@ body {
         </head>
 
         <body>
-        <div class="title"><a href="[% writer_url %]">[% writer %]</a> 《 <a href="[% url %]">[% book %]</a> 》</div>
+        <div id="title"><a href="[% writer_url %]">[% writer %]</a> 《 <a href="[% url %]">[% book %]</a> 》</div>
         $toc
 <div id="content">
     [% FOREACH r IN item_list %]
