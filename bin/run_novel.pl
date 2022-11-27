@@ -101,7 +101,7 @@ sub get_ebook {
   #conv html to ebook
   my ( $fh_e, $f_e ) = $o{t}
     ? tempfile(
-    "run_novel-ebook-XXXXXXXXXXXXXXXX",
+    "$writer-$book-ebook-XXXXXXXXXXXXXXXX",
     TMPDIR => 1,
     SUFFIX => ".$type"
     )
