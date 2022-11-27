@@ -38,7 +38,7 @@ sub convert_novel {
     'page-breaks-before' => "/",
     'max-toc-links'      => 0,
   );
-  $conv{tags} = join(",", $conv{authors}, $conv{title});
+  #$conv{tags} = join(",", $conv{authors}, $conv{title});
 
   my $conv_str = join( " ", map { qq[--$_ "$conv{$_}"] } keys( %conv ) );
   my $cmd = qq[ebook-convert "$opt{f}" "$dst_file" $conv_str];

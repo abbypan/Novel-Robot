@@ -120,7 +120,8 @@ sub send_ebook {
   my ( $f_e, $msg, %o ) = @_;
 
   print "send ebook : $msg, $f_e, $o{t}\n";
-  my $cmd = qq[sendEmail -u "$msg" -m "$msg" -a "$f_e" -t "$o{t}" $o{S}];
+  #my $cmd = qq[sendEmail -o message-charset=utf8 -u "$msg" -m "$msg" -a "$f_e" -t "$o{t}" $o{S}];
+  my $cmd=qq[calibre-smtp -a "$f_e" -s "$msg" $o{S} "$o{t}" "$msg"];
   if ( $o{h} ) {
     system( qq[ansible $o{h} -m copy -a 'src=$f_e dest=/tmp/'] );
     system( encode( locale => qq[ansible $o{h} -m shell -a '$cmd'] ) );
