@@ -24,7 +24,7 @@ L<Novel::Robot::Packer>
 
 for example, on debian, 以debian环境为例
 
-    $ apt-get install parallel sendemail ansible calibre cpanminus
+    $ apt-get install parallel ansible calibre cpanminus
     $ cpanm Novel::Robot
 
 =head1 run_novel.pl
@@ -35,50 +35,48 @@ download and convert ebook, 简单下载或处理电子书
 
 download the whole novel and convert to ebook 下载全本小说并转换为电子书
 
-    run_novel.pl -u "http://www.jjwxc.net/onebook.php?novelid=14838" -T mobi
+    run_novel.pl -u "http://www.jjwxc.net/onebook.php?novelid=14838" -T epub
     run_novel.pl -u "http://www.jjwxc.net/onebook.php?novelid=14838" -o mytest.epub
 
-download 1-3 chapter 下载小说的1-3章，最终输出文件名为abc.mobi
+download 1-3 chapter 下载小说的1-3章，最终输出文件名为abc.epub
 
-    run_novel.pl -u "http://www.jjwxc.net/onebook.php?novelid=14838" -o abc.mobi -G "-i 1-3"
+    run_novel.pl -u "http://www.jjwxc.net/onebook.php?novelid=14838" -o abc.epub -G "-i 1-3"
 
 =head2 deal txt and convert
 
 convert txt to ebook, 把txt文件转成电子书
 
-    run_novel.pl -f 飘灯-风尘叹.txt -T mobi
-    run_novel.pl -f fct.txt -w 飘灯 -b 风尘叹 -T mobi
+    run_novel.pl -f 飘灯-风尘叹.txt -T epub
+    run_novel.pl -f fct.txt -w 飘灯 -b 风尘叹 -T epub
 
 =head2  download by site-writer-book and convert
 
-    run_novel.pl -s lofter -T mobi -w chuweizhiyu -b 时之足
-    run_novel.pl -s lofter -T mobi -w chuweizhiyu -b 时之足 -G "-i 3-"
-    run_novel.pl -s lofter -T mobi -w chuweizhiyu -b 时之足 -G "-i 3-5"
+    run_novel.pl -s lofter -T epub -w chuweizhiyu -b 时之足
+    run_novel.pl -s lofter -T epub -w chuweizhiyu -b 时之足 -G "-i 3-"
+    run_novel.pl -s lofter -T epub -w chuweizhiyu -b 时之足 -G "-i 3-5"
 
 =head2 send novel with email
 
-download/convert novel, use L<sendEmail|http://caspian.dotconf.net/menu/Software/SendEmail/> send mobi to email address : xxx@kindle.cn
+download/convert novel, use calibre-smtp to send ebook to email address : xxx@kindle.cn
 
-下载小说并使用sendEmail推送到指定邮箱
+下载小说并使用calibre-smtp推送到指定邮箱
 
 local smtp service 本地已安装smtp服务
 
-    run_novel.pl -u "http://www.jjwxc.net/onebook.php?novelid=14838" -T mobi -t "xxx@kindle.cn" -S "-f yyy@somesite.cn"
-    run_novel.pl -f fct.txt -w 飘灯 -b 风尘叹 -T mobi -t "xxx@kindle.cn" -S "-f yyy@somesite.cn"
+    run_novel.pl -u "http://www.jjwxc.net/onebook.php?novelid=14838" -T epub -t "xxx@kindle.cn" -S " yyy@somesite.cn "
+    run_novel.pl -f fct.txt -w 飘灯 -b 风尘叹 -T epub -t "xxx@kindle.cn" -S " yyy@somesite.cn "
 
 remote smtp service 使用远程smtp服务
 
-    run_novel.pl -u "http://www.jjwxc.net/onebook.php?novelid=14838" -T mobi -t "xxx@kindle.cn" -G "-i 1-3"  -S "-f yyy@somesite.cn -s smtp.src.com -xu xxx -xp somepwd"
-    run_novel.pl -u "http://www.jjwxc.net/onebook.php?novelid=14838" -T mobi -t "xxx@kindle.cn" -S "-f yyy@qq.com -s smtp.qq.com:587 -o tls=yes -xu yyy -xp 'aaaaaaaaaaaaagga'"
-    run_novel.pl -f fct.txt -w 飘灯 -b 风尘叹 -T mobi -t "xxx@kindle.cn" -S "-f yyy@somesite.cn -s smtp.src.com -xu xxx -xp somepwd"
-    run_novel.pl -f fct.txt -w 飘灯 -b 风尘叹 -T mobi -T mobi -t "xxx@kindle.cn" -S "-f yyy@qq.com -s smtp.qq.com:587 -o tls=yes -xu yyy -xp 'aaaaaaaaaaaaagga'"
+    run_novel.pl -u "http://www.jjwxc.net/onebook.php?novelid=14838" -T epub -t "xxx@kindle.cn" -G "-i 1-3"  -S " --relay smtp.src.com --port 587 -u xxx -p somepwd yyy@somesite.cn "
+    run_novel.pl -u "http://www.jjwxc.net/onebook.php?novelid=14838" -T epub -t "xxx@kindle.cn" -S " --relay smtp.qq.com --port 587 -u yyy -p 'aaaaaaaaaaaaagga' yyy@qq.com "
+    run_novel.pl -f fct.txt -w 飘灯 -b 风尘叹 -T epub -T epub -t "xxx@kindle.cn" -S " --relay smtp.qq.com --port 587 -u yyy -p 'aaaaaaaaaaaaagga' yyy@qq.com "
 
-use L<ansible|https://www.ansible.com/>，push ebook to remote host, and then sendEmail 
+use L<ansible|https://www.ansible.com/>，push ebook to remote host, and then send email 
 
-使用ansible把电子书上传到远程服务器，再在远程服务器调用sendEmail在服务器直接smtp推送
+使用ansible把电子书上传到远程服务器，再在远程服务器调用calibre-smtp在服务器直接smtp推送
 
-    run_novel.pl -h remote.vps.com -u "http://www.jjwxc.net/onebook.php?novelid=14838" -T mobi -t "xxx@kindle.cn" -S "-f yyy@somesite.cn"
-    run_novel.pl -h remote.vps.com -f fct.txt -w 飘灯 -b 风尘叹 -T mobi -t "xxx@kindle.cn" -S "-f yyy@somesite.cn"
+    run_novel.pl -h remote.vps.com -u "http://www.jjwxc.net/onebook.php?novelid=14838" -T epub -t "xxx@kindle.cn" -S " --relay smtp.qq.com --port 587 -u yyy -p 'aaaaaaaaaaaaagga' yyy@qq.com "
 
 =head2 ARG
 
@@ -95,7 +93,7 @@ use L<ansible|https://www.ansible.com/>，push ebook to remote host, and then se
 
     -G : get_novel.pl args
     -C : conv_novel.pl args
-    -S : sendEmail args
+    -S : calibre-smtp send email args
 
     -h : remote host,远程调用的机器名
 
@@ -195,14 +193,14 @@ only print info, but not download, 输出小说信息（不下载）
 
 =head1 conv_novel.pl
     
-use L<calibre|https://calibre-ebook.com/> to convert novel file into epub/mobi/..., default filename format is [writer]-[bookname].[type]
+use L<calibre|https://calibre-ebook.com/> to convert novel file into epub/epub/..., default filename format is [writer]-[bookname].[type]
 
-使用calibre将下载的 html格式 的小说转换成 其他格式的电子书，例如epub、mobi等等。如果未指定writer及book选项，则需要将html源文件名称设置为 [作者-书名]
+使用calibre将下载的 html格式 的小说转换成 其他格式的电子书，例如epub、epub等等。如果未指定writer及book选项，则需要将html源文件名称设置为 [作者-书名]
 
     conv_novel.pl -f [txt_file] -T [type] -w [writer] -b [book]
     conv_novel.pl -f [源文件] -T [目标文件类型(小写)] -w [作者] -b [书名]
 
-    conv_novel.pl -f 天平-风起阿房.html -T mobi
+    conv_novel.pl -f 天平-风起阿房.html -T epub
     conv_novel.pl -f mxj.html -w 施定柔 -b 迷侠记 -T epub
 
 =head1 bulk_novel.pl
@@ -240,11 +238,11 @@ bulk download novels
 
 manually select some novels, use parallel for multiple novels download
     
-手动选择下载部分小说，用L<parallel|https://www.gnu.org/software/parallel/>批量调用run_novel.pl获取mobi
+手动选择下载部分小说，用L<parallel|https://www.gnu.org/software/parallel/>批量调用run_novel.pl获取epub
 
     bulk_novel.pl -s jjwxc -q 作者 -k 牵机 -P 1 > raw_booklist.txt
     awk -F, '$1=="牵机"' raw_booklist.txt > refine_booklist.txt
-    parallel --colsep , run_novel.pl -u "{3}" -T mobi :::: refine_booklist.txt
+    parallel --colsep , run_novel.pl -u "{3}" -T epub :::: refine_booklist.txt
 
 =head2 ARG
 
