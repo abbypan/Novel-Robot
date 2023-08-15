@@ -12,7 +12,7 @@ use FindBin;
 use Getopt::Long qw(:config no_ignore_case);
 use Novel::Robot;
 use POSIX qw/ceil/;
-use Smart::Comments;
+#use Smart::Comments;
 
 $| = 1;
 #binmode( STDIN,  ":encoding(console_in)" );
