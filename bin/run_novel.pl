@@ -87,7 +87,9 @@ sub main_ebook {
     $o{writer} //= $writer // '';
     $o{book} //= $book // '';
     $f_e = get_ebook( %o );
-    $msg = "$writer : $book , $chap_num";
+    $msg = "$writer : $book ";
+    $msg .= ", $o{item}" if(defined $o{item});
+    $msg .= ", $chap_num" if(defined $chap_num);
   }else {
     $f_e = get_ebook( %o );
     $msg = "$o{site} : $o{writer} 《$o{book}》";
@@ -99,6 +101,9 @@ sub main_ebook {
       $o{mail_msg} //= $msg;
       my $o_str = join( " ", map { qq[--$_  "$o{$_}"] } grep { /^mail_/ } keys( %o ) );
       system(qq[$SEND_NOVEL $o_str]);
+      if($o{url}=~/^https?:/){
+          unlink($f_e);
+      }
   }
 
   return $f_e;
@@ -116,22 +121,22 @@ sub get_ebook {
 
   my $min_id = '';
   my $book   = $o{book};
-  if ( $o_str and ( $min_id ) = $o_str =~ m#-i\s+['"]?(\d+)-# ) {
+  if ( $o_str and ( $min_id ) = $o_str =~ m#--item\s+['"]?(\d+)-?\d*# ) {
     $book .= "-$min_id" if ( $min_id and $min_id > 1 );
   }
 
   $o{ebook_output} =~ s#/?$## if(defined $o{ebook_output});
   my $ebook_f =
-      ( $o{ebook_output} and -d $o{ebook_output} ) ? "$o{ebook_output}/$o{writer}-$o{book}.$o{ebook_type}"
+      ( $o{ebook_output} and -d $o{ebook_output} ) ? "$o{ebook_output}/$o{writer}-$book.$o{ebook_type}"
     : $o{ebook_output}                             ? $o{ebook_output}
-    :                                                "$o{writer}-$o{book}.$o{ebook_type}";
+    :                                                "$o{writer}-$book.$o{ebook_type}";
   my ( $type ) = $ebook_f =~ /\.([^.]+)$/;
 
   return unless ( -f $html_f and -s $html_f );
 
   my ( $fh_e, $f_e ) = $o{t}
     ? tempfile(
-    "$o{writer}-$o{book}-ebook-XXXXXXXXXXXXXXXX",
+    "$o{writer}-$book-ebook-XXXXXXXXXXXXXXXX",
     TMPDIR => 1,
     SUFFIX => ".$type"
     )

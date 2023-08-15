@@ -35,7 +35,7 @@ send_novel(%opt);
 sub send_novel {
 my ( %o ) = @_;
 
-print "send novel : $o{mail_msg}, $o{mail_attach}, $o{mail_to}\n";
+print "send_novel : $o{mail_msg}, $o{mail_attach}, $o{mail_to}\n";
 my $cmd=qq[calibre-smtp -a "$o{mail_attach}" -s "$o{mail_msg}" --relay $o{mail_server} --port $o{mail_port} -u "$o{mail_usr}" -p "$o{mail_pwd}" "$o{mail_from}" "$o{mail_to}" "$o{mail_msg}"];
 
 #if ( $o{R} ) {
