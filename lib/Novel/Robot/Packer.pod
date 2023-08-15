@@ -4,15 +4,13 @@
 
 =head1 NAME
 
-L<Novel::Robot::Packer> pack novel/bbs content to txt / html / raw, etc
+L<Novel::Robot::Packer> pack novel/bbs content to ebook
 
 小说/贴子 打包引擎
 
 =head2 type
 
 支持输出类型
-
-    raw  : 经过MessagePack压缩的二进制文件
 
     html : html单网页格式
 

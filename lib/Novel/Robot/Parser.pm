@@ -315,7 +315,7 @@ sub guess_item_list {
     $res_arr = $arr if ( $opt{chapter_url_regex}   and $x->{url}   =~ /$opt{chapter_url_regex}/ );
     $res_arr = $arr if ( $opt{chapter_title_regex} and $x->{title} =~ /$opt{chapter_title_regex}/ );
     $res_arr = $arr
-      if ( $x->{title} =~ /$title_regex/ or ( $y and $y->{title} =~ /$title_regex/ ) or ( $z and $z->{title} =~ /$title_regex/ ) );
+      if ( ($x and $x->{title} =~ /$title_regex/) or ( $y and $y->{title} =~ /$title_regex/ ) or ( $z and $z->{title} =~ /$title_regex/ ) );
     $res_arr = $arr if ( ( $x->{url} =~ /$chap_num_regex/ or $z->{url} =~ /$chap_num_regex/ ) and scalar( @$arr ) > 50 );
 
     #$res_arr= $arr if( ($x->{url}=~/\/?\d+$/ or $z->{url}=~/\/?\d+$/) and scalar(@$arr)>50);
@@ -374,6 +374,15 @@ sub parse_novel_item {
   $r = $self->guess_novel_item( $h ) unless ( $r->{content} );
   $r->{$_} ||= $NULL_CHAPTER{$_} for keys( %NULL_CHAPTER );
   $r->{content} = $self->tidy_content( $r->{content} );
+
+  my $next_url = $self->scrape_element_try($h, [ 
+          { path => '//a[@id="next_url"]', extract =>'@href' }, 
+          { path  => '//a[contains(text(),"下一页")]',           extract => '@href' },
+      ]);
+  if($next_url){
+      $r->{next_url} = $next_url;
+  }
+
   return $r;
 }
 

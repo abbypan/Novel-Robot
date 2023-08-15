@@ -20,7 +20,7 @@ sub convert_novel {
   my ( %opt ) = @_;
   return unless(-f $opt{f} and -s $opt{f});
 
-  $opt{T} ||= 'mobi';
+  $opt{T} ||= 'epub';
 
   my $dst_file = $opt{T};
   unless ( $dst_file =~ /[^.]+\.[^.]+$/ ) {
@@ -39,12 +39,18 @@ sub convert_novel {
     'max-toc-links'      => 0,
   );
   #$conv{tags} = join(",", $conv{authors}, $conv{title});
+  
 
   my $conv_str = join( " ", map { qq[--$_ "$conv{$_}"] } keys( %conv ) );
+  if($opt{T}=~/\.epub$/){
+      $conv_str .= " --dont-split-on-page-breaks ";
+  }elsif($opt{T} =~ /\.mobi$/){
+      $conv_str .= " --mobi-keep-original-images ";
+  }
+
   my $cmd = qq[ebook-convert "$opt{f}" "$dst_file" $conv_str];
 
-  $cmd .= " --mobi-keep-original-images" if ( $opt{T} =~ /mobi$/ );
-  system( $cmd);
+  system($cmd);
 
   return $dst_file;
 } ## end sub convert_novel
