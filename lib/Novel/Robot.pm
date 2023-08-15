@@ -6,6 +6,9 @@ use utf8;
 
 use Novel::Robot::Parser;
 use Novel::Robot::Packer;
+use File::Copy;
+use Encode::Locale;
+use Encode;
 
 our $VERSION = 0.42;
 
@@ -55,9 +58,16 @@ sub get_novel {
   print "\nlast_item_num: $last_item_num\n" if ( $o{verbose} );
 
   $self->{packer}->format_item_output( $novel_ref, \%o );
-  my $r = $self->{packer}->main( $novel_ref, %o );
-  return wantarray ? ( $r, $novel_ref ) : $r;
+  my $dst_f = $self->{packer}->main( $novel_ref, %o );
+    
+  #my $dst_f = convert_novel($src_f, $o{ebook_output},  writer=> $novel_ref->{writer}, book=> $novel_ref->{book});
+  #if($index_url=~/^https?:/ and ($src_f ne $dst_f) and (-f $src_f)){
+      #unlink($src_f);
+  #}
+
+  return wantarray ? ( $dst_f, $novel_ref ) : $dst_f;
 } ## end sub get_novel
+
 
 sub split_index {
   my $s = $_[-1];

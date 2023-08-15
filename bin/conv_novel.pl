@@ -4,53 +4,80 @@ use warnings;
 use utf8;
 use Encode qw/:all/;
 use Encode::Locale;
-use Getopt::Std;
+use Getopt::Long qw(:config no_ignore_case);
+
 $| = 1;
 
-binmode( STDIN,  ":encoding(console_out)" );
-binmode( STDOUT, ":encoding(console_out)" );
-binmode( STDERR, ":encoding(console_out)" );
+#binmode( STDIN,  ":encoding(console_out)" );
+#binmode( STDOUT, ":encoding(console_out)" );
+#binmode( STDERR, ":encoding(console_out)" );
 
 my %opt;
-getopt( 'fTwb', \%opt );
+
+GetOptions(
+  \%opt,
+  'ebook_input|f=s',
+  'ebook_output|o=s',
+  'ebook_type|t=s',
+  'writer|w=s', 'book|b=s',
+);
 
 my $convert_file = convert_novel( %opt );
 
 sub convert_novel {
   my ( %opt ) = @_;
-  return unless(-f $opt{f} and -s $opt{f});
 
-  $opt{T} ||= 'epub';
+  return $opt{ebook_input} unless ( -f $opt{ebook_input} and -s $opt{ebook_input} );
+  my ( $src_f_type ) = $opt{ebook_input} =~ m#\.([^.]+)$#;
 
-  my $dst_file = $opt{T};
-  unless ( $dst_file =~ /[^.]+\.[^.]+$/ ) {
-    $dst_file = $opt{f};
-    $dst_file =~ s/[a-z0-9]+$/$opt{T}/i;
+  if ( !defined $opt{ebook_output} ) {
+    $opt{ebook_output} = $opt{ebook_input};
+    $opt{ebook_output} =~ s/\.([^.]+)$/.$opt{ebook_type}/;
   }
-  print decode(locale=>"$opt{f} => $dst_file\n");
 
-  my ( $writer, $book ) = $opt{f} =~ /([^\\\/]+?)-([^\\\/]+?)\.[^.\\\/]+$/;
-  my %conv = (
-    'authors' => $opt{w} || $writer,
-    'author-sort' => $opt{w} || $writer,
-    'title'   => $opt{b} || $book,
-    'chapter-mark'       => "none",
-    'page-breaks-before' => "/",
-    'max-toc-links'      => 0,
-  );
-  #$conv{tags} = join(",", $conv{authors}, $conv{title});
-  
+  ( $opt{ebook_type} ) = $opt{ebook_output} =~ m#\.([^.]+)$#;
 
-  my $conv_str = join( " ", map { qq[--$_ "$conv{$_}"] } keys( %conv ) );
-  if($opt{T}=~/\.epub$/){
+  return $opt{ebook_input} if ( $opt{ebook_output} eq $opt{ebook_input} );
+
+  print "conv_novel: $opt{ebook_input} => $opt{ebook_output}\n";
+
+  if ( lc( $src_f_type ) eq lc( $opt{ebook_type} ) ) {
+    copy( $opt{ebook_input}, $opt{ebook_output} );
+  } else {
+
+    my ( $writer, $book ) = $opt{ebook_input} =~ /([^\\\/]+?)-([^\\\/]+?)\.[^.\\\/]+$/;
+
+    #$writer = encode( locale => $opt{writer} ) if ( defined $opt{writer} );
+    $writer = $opt{writer} if ( defined $opt{writer} );
+    $writer //= '';
+
+    #$book = encode( locale => $opt{book} ) if ( defined $opt{book} );
+    $book = $opt{book} if ( defined $opt{book} );
+    $book //= '';
+
+    my %conv = (
+      'authors'            => $writer,
+      'author-sort'        => $writer,
+      'title'              => $book,
+      'chapter-mark'       => "none",
+      'page-breaks-before' => "/",
+      'max-toc-links'      => 0,
+    );
+
+    my $conv_str = join( " ", map { qq[--$_ "$conv{$_}"] } keys( %conv ) );
+    if ( $opt{ebook_type} =~ /\.epub$/ ) {
       $conv_str .= " --dont-split-on-page-breaks ";
-  }elsif($opt{T} =~ /\.mobi$/){
+    } elsif ( $opt{ebook_type} =~ /\.mobi$/ ) {
       $conv_str .= " --mobi-keep-original-images ";
-  }
+    }
 
-  my $cmd = qq[ebook-convert "$opt{f}" "$dst_file" $conv_str];
+    my $cmd = qq[ebook-convert "$opt{ebook_input}" "$opt{ebook_output}" $conv_str];
 
-  system($cmd);
+    #system( $cmd);
+    `$cmd`;
 
-  return $dst_file;
+  } ## end else [ if ( lc( $src_f_type )...)]
+
+  return $opt{ebook_output};
 } ## end sub convert_novel
+
