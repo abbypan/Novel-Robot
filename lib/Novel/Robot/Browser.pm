@@ -64,7 +64,6 @@ sub request_url_whole {
   my $html = $self->request_url( $url, $o{post_data} );
 
   my $info      = $o{info_sub}->( \$html )     || {};
-  print "\r$info->{writer}, $info->{book}, $url\n" if ( $o{verbose} );
   my $data_list = $o{item_list} || $o{item_list_sub}->( \$html ) || [];
 
   my $i = 1;
@@ -242,7 +241,6 @@ sub read_moz_cookie {
     @segment = map { my @c = split /=/; [ $dom, undef, '/', undef, 0, $c[0], $c[1] ] } @ck;
   }
 
-  #print Dumper(\@segment);
 
   @segment = grep { defined $_->[6] and $_->[6] =~ /\S/ } @segment;
 

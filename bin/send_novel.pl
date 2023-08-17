@@ -38,12 +38,6 @@ my ( %o ) = @_;
 print "send_novel : $o{mail_msg}, $o{mail_attach}, $o{mail_to}\n";
 my $cmd=qq[calibre-smtp -a "$o{mail_attach}" -s "$o{mail_msg}" --relay $o{mail_server} --port $o{mail_port} -u "$o{mail_usr}" -p "$o{mail_pwd}" "$o{mail_from}" "$o{mail_to}" "$o{mail_msg}"];
 
-#if ( $o{R} ) {
-#system( qq[ansible $o{R} -m copy -a 'src=$file dest=/tmp/'] );
-#system( encode( locale => qq[ansible $o{R} -m shell -a '$cmd'] ) );
-#system( qq[ansible $o{R} -m shell -a 'rm $file'] );
-#} else {
 system($cmd);
-#}
-#unlink( $file );
+
 }

@@ -27,7 +27,7 @@ my %opt;
 GetOptions(
     \%opt,
     'site|s=s', 'url|u=s', 'file|f=s', 'writer|w=s', 'book|b=s',
-    'ebook_type|t=s', 'ebook_output|o=s',
+    'type|t=s', 'output|o=s',
     'item|i=s', 'page|j=s', 'cookie|c=s',
     'not_download|D', 'verbose|v',
     'term_progress_bar', 
@@ -56,116 +56,29 @@ GetOptions(
     'mail_from|F=s', 'mail_to|T=s', 
 );
 
-%opt = read_option(%opt);
-
+#%opt = read_option(%opt);
 
 main_ebook( %opt );
 
 sub main_ebook {
-  my ( %o ) = @_;
+my ( %o ) = @_;
 
-  my ( $fh, $f_e, $msg );
+my %get_opt = map { $_ => $o{$_} } grep { ! /^mail_/ } keys( %o );
+$get_opt{verbose}=1;
+my $o_str = join( " ", map { qq[--$_  "$get_opt{$_}"] } keys(%get_opt));
 
-  if ( $o{file} and -f $o{file} ) {
-    if ( $o{file} =~ /\.txt/i ) {
-      my ( $writer, $book ) = $o{file} =~ /([^\\\/]+?)-([^\\\/]+?)\.[^.\\\/]+$/;
-      $o{writer} ||= $writer;
-      $o{book} ||= $book;
-      $f_e = get_ebook( %o );
-      $msg = "$o{writer} : $o{book}";
-    } else {
-      my ( $f_s ) = $o{file} =~ /\.([^.]+)$/i;
-      ( $fh, $f_e ) = tempfile( "run_novel-raw-XXXXXXXXXXXXXX", TMPDIR => 1, SUFFIX => ".$f_s" );
-      copy( $o{file}, $f_e );
-      $msg = "$o{file} => $f_e";
+my $msg = `$GET_NOVEL $o_str`;
+my %m = map { split /:\s+/, $_ } (split /\n/, $msg);
+
+if($o{mail_to} and -f $m{output}){
+    $o{mail_attach} //= $m{output};
+    $o{mail_msg} //= $m{info};
+    my $o_str = join( " ", map { qq[--$_  "$o{$_}"] } grep { /^mail_/ } keys( %o ) );
+    system(qq[$SEND_NOVEL $o_str]);
+    if($o{url}=~/^https?:/){
+        unlink($m{output});
     }
-  } elsif($o{url}) {
-    my $info_cmd = qq[$GET_NOVEL -u "$o{url}" -D 1];
-    my $info = `$info_cmd`;
-    chomp( $info );
-    my ( $writer, $book, $url, $chap_num ) = split ',', $info;
-    $o{writer} //= $writer // '';
-    $o{book} //= $book // '';
-    $f_e = get_ebook( %o );
-    $msg = "$writer : $book ";
-    $msg .= ", $o{item}" if(defined $o{item});
-    $msg .= ", $chap_num" if(defined $chap_num);
-  }else {
-    $f_e = get_ebook( %o );
-    $msg = "$o{site} : $o{writer} 《$o{book}》";
-  }
-
-  if($o{mail_to} and -f $f_e){
-      $o{mail_attach} //= $f_e;
-      #send_ebook(%o);
-      $o{mail_msg} //= $msg;
-      my $o_str = join( " ", map { qq[--$_  "$o{$_}"] } grep { /^mail_/ } keys( %o ) );
-      system(qq[$SEND_NOVEL $o_str]);
-      if($o{url}=~/^https?:/){
-          unlink($f_e);
-      }
-  }
-
-  return $f_e;
-} ## end sub main_ebook
-
-sub get_ebook {
-  my ( %src_o ) = @_;
-
-  my ( $fh, $html_f ) = tempfile( "run_novel-html-XXXXXXXXXXXXXX", TMPDIR => 1, SUFFIX => ".html" );
-
-  my %o     = ( %src_o, output => $html_f );
-  my $o_str = join( " ", map { qq[--$_  "$o{$_}"] } grep { ! /^(ebook|mail)_/ } keys( %o ) );
-
-  system( qq[$GET_NOVEL $o_str] );
-
-  my $min_id = '';
-  my $book   = $o{book};
-  if ( $o_str and ( $min_id ) = $o_str =~ m#--item\s+['"]?(\d+)-?\d*# ) {
-    $book .= "-$min_id" if ( $min_id and $min_id > 1 );
-  }
-
-  $o{ebook_output} =~ s#/?$## if(defined $o{ebook_output});
-  my $ebook_f =
-      ( $o{ebook_output} and -d $o{ebook_output} ) ? "$o{ebook_output}/$o{writer}-$book.$o{ebook_type}"
-    : $o{ebook_output}                             ? $o{ebook_output}
-    :                                                "$o{writer}-$book.$o{ebook_type}";
-  my ( $type ) = $ebook_f =~ /\.([^.]+)$/;
-
-  return unless ( -f $html_f and -s $html_f );
-
-  my ( $fh_e, $f_e ) = $o{t}
-    ? tempfile(
-    "$o{writer}-$book-ebook-XXXXXXXXXXXXXXXX",
-    TMPDIR => 1,
-    SUFFIX => ".$type"
-    )
-    : ( '', $ebook_f );
-
-  if ( $type ne 'html' ) {
-    my %o     = ( %src_o, ebook_output => $ebook_f, ebook_input => $html_f );
-    my $o_str = join( " ", map { qq[--$_  "$o{$_}"] } grep { defined $o{$_} } (qw/ebook_input ebook_output ebook_type writer book/) );
-
-    #system( encode( locale => qq[conv_novel.pl -f "$html_f" -T "$f_e" -w "$writer" -b "$book" $o{C}] ) );
-    system( qq[$CONV_NOVEL $o_str] );
-
-    unlink( $html_f ) if($o{url});
-  } else {
-    copy( $html_f, $f_e );
-  }
-
-  return $f_e;
-} ## end sub get_ebook
-
-sub read_option {
-my ( %opt ) = @_;
-
-if($opt{ebook_output}){
-    ($opt{output}, $opt{ebook_type}) = $opt{ebook_output}=~m#^(.+?)\.([^.]+)$#;
 }
-$opt{ebook_type} ||= 'html';
-$opt{type} = $opt{ebook_type} eq 'txt' ? 'txt': 'html';
-$opt{output} = defined $opt{ebook_output} ? "$opt{output}.$opt{type}" : undef;
 
-return %opt;
-} ## end sub read_option
+return $m{output};
+} ## end sub main_ebook
