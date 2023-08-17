@@ -10,7 +10,7 @@ use File::Copy;
 use Encode::Locale;
 use Encode;
 
-our $VERSION = 0.42;
+our $VERSION = 0.43;
 
 sub new {
   my ( $self, %opt ) = @_;

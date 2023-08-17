@@ -12,9 +12,9 @@ L<Novel::Robot::Packer> pack novel/bbs content to ebook
 
 支持输出类型
 
-    html : html单网页格式
+    default : html 单网页格式
 
-    txt  : txt文本格式
+    others :  txt, epub, mobi, ...
 
 =head1 FUNCTION
 
@@ -37,7 +37,6 @@ L<Novel::Robot::Packer> pack novel/bbs content to ebook
        ], 
    };
    
-   my $ret = $self->main($book_ref, with_toc => 1);
-
+   my $ret = $packer->main($book_ref, { with_toc => 1 } );
 
 =cut
