@@ -59,7 +59,7 @@ if ( $opt{file} ) {
     my @path = split ',', $opt{file};
     ( $outf, $bookr ) = $xs->get_novel( \@path, %opt );
   } else {
-    $xs->{packer}->convert_novel( $opt{file}, $opt{output}, \%opt );
+    $outf = $xs->{packer}->convert_novel( $opt{file}, $opt{output}, \%opt );
   }
 } elsif ( $opt{url} ) {
   if ( $opt{not_download} ) {
@@ -98,8 +98,9 @@ if($opt{mail_to} and -f $outf){
 sub send_novel {
   my ( $outf, $bookr, %o ) = @_;
 
-  my $msg = qq[$bookr->{writer}-$bookr->{book}-$bookr->{item_num}] ;
   my $outfname= decode(locale=>$outf);
+  my $msg = $bookr->{writer} ? qq[$bookr->{writer}-$bookr->{book}-$bookr->{item_num}] : $outfname;
+  $msg=~s#^.*/##;
 
   my $cmd = qq[calibre-smtp -a "$outfname" -s "$msg" --relay $o{mail_server} --port $o{mail_port} -u "$o{mail_usr}" -p "$o{mail_pwd}" "$o{mail_from}" "$o{mail_to}" "$msg"];
   print encode(locale=>$cmd), "\n";
