@@ -38,6 +38,18 @@ sub set_packer {
   return $self;
 }
 
+sub get_page {
+  my ( $self, $page_url, %o ) = @_;
+
+  my $page_ref = $self->{parser}->get_page_ref( $page_url, %o );
+
+  my $dst_f = $self->{packer}->main( $page_ref, \%o );
+  my $dst_fname = decode(locale=>$dst_f);
+  print encode(locale=>"info: $page_ref->{writer}-$page_ref->{book}-1\noutput: $dst_fname\nlast_item_num: 1\n") if ( $o{verbose} );
+    
+  return wantarray ? ( $dst_f, $page_ref ) : $dst_f;
+}
+
 sub get_novel {
   my ( $self, $index_url, %o ) = @_;
 

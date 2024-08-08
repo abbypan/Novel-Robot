@@ -21,7 +21,7 @@ GetOptions(
   'site|s=s',       'url|u=s', 'file|f=s', 'writer|w=s', 'book|b=s',
   'type|t=s',       'output|o=s',
   'item|i=s',       'page|j=s', 'cookie|c=s',
-  'not_download|D', 'verbose|v',
+  'not_download|D', 'single_page', 'verbose|v',
   'progress',
 
   'use_chrome',
@@ -65,7 +65,9 @@ if ( $opt{file} ) {
   if ( $opt{not_download} ) {
     my $r = $xs->{parser}->get_novel_info( $opt{url}, %opt, max_page_num => 1 );
     print join( ",", $r->{writer} || '', $r->{book} || $r->{title} || '', $r->{url} || '', $r->{item_num} || '' ), "\n";
-  } else {
+  } elsif($opt{single_page}){
+        ($outf, $bookr) = $xs->get_page($opt{url}, %opt);
+  }else{
     ( $outf, $bookr ) = $xs->get_novel( $opt{url}, %opt );
   }
 } elsif ( $opt{site} and $opt{writer} and $opt{book} ) {
