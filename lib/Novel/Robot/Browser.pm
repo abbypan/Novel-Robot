@@ -80,6 +80,7 @@ sub request_url_whole {
       next if ( $o{min_page_num} and $i < $o{min_page_num} );
       last if ( $o{max_page_num} and $i > $o{max_page_num} );
 
+
       my ( $u_url, $u_post_data ) = ref( $u ) eq 'HASH' ? @{$u}{qw/url post_data/} : ( $u, undef );
       my $c = $self->request_url( $u_url, $u_post_data );
       my $fs = $o{item_list_sub}->( \$c );
@@ -111,6 +112,9 @@ sub request_url_whole {
       $r->{id} //= ++$item_id;
       $r->{url} = URI->new_abs( $r->{url}, $url )->as_string;
       next unless ( $self->is_item_in_range( $r->{id}, $o{min_item_num}, $o{max_item_num} ) );
+      if(exists $o{back_index}){
+          last if($i + $o{back_index} > $#$data_list);
+      }
 
       if($r->{url}){
           my $c = $self->request_url( $r->{url}, $r->{post_data} );

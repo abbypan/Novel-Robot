@@ -20,7 +20,9 @@ GetOptions(
 
   'site|s=s',       'url|u=s', 'file|f=s', 'writer|w=s', 'book|b=s',
   'type|t=s',       'output|o=s',
-  'item|i=s',       'page|j=s', 'cookie|c=s',
+  'item|i=s',      'back_index=s', 
+  'page|j=s', 
+  'cookie|c=s',
   'not_download|D', 'single_page', 'verbose|v',
   'progress',
 
