@@ -5,19 +5,18 @@ use strict;
 use warnings;
 use utf8;
 
-#our $VERSION = 0.22;
+our $VERSION = 0.22;
 
-#use Novel::Robot::Browser::CookieJar;
-use HTTP::CookieJar;
-use Data::Dumper;
+#use Data::Dumper;
 
-use File::Slurp qw/slurp/;
 use Encode::Detect::CJK qw/detect/;
 use Encode;
+use File::Slurp qw/slurp/;
+use HTTP::CookieJar;
 use HTTP::Tiny;
-use Parallel::ForkManager;
-use Term::ProgressBar;
 use IO::Uncompress::Gunzip qw(gunzip);
+#use Parallel::ForkManager;
+use Term::ProgressBar;
 use URI::Escape;
 use URI;
 

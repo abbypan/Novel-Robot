@@ -5,16 +5,17 @@ use strict;
 use warnings;
 use utf8;
 
-use Novel::Robot::Browser;
-use URI;
+#use Data::Dumper;
 use Encode;
-use Web::Scraper;
 use HTML::TreeBuilder;
-use Data::Dumper;
+use URI;
+use Web::Scraper;
+
+use Novel::Robot::Browser;
 #use Smart::Comments;
 
+our $VERSION = 0.32;
 
-#our $VERSION = 0.32;
 
 our %SITE_DOM_NAME = (
   'bbs.jjwxc.net'   => 'hjj',

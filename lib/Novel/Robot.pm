@@ -6,11 +6,11 @@ use utf8;
 
 use Novel::Robot::Parser;
 use Novel::Robot::Packer;
-use File::Copy;
+#use File::Copy;
 use Encode::Locale;
 use Encode;
 
-our $VERSION = 0.44;
+our $VERSION = 0.45;
 
 sub new {
   my ( $self, %opt ) = @_;
