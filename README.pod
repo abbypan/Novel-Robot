@@ -27,7 +27,7 @@ for example, on debian, 以debian环境为例
     $ apt-get install parallel ansible calibre cpanminus
     $ cpanm Novel::Robot
 
-=head2 example
+=head2 EXAMPLE
 
     get_novel.pl -u "http://www.jjwxc.net/onebook.php?novelid=14838" -t epub
     get_novel.pl -u "http://www.jjwxc.net/onebook.php?novelid=14838" -o mytest.epub
@@ -147,17 +147,17 @@ only print info, but not download, 输出小说信息（不下载）
     get_novel.pl -u [url] -D 1
     get_novel.pl -u "http://www.jjwxc.net/onebook.php?novelid=14838"  -D 1
 
-=head1 convert ebook
+=head2 convert ebook
     
 use L<calibre|https://calibre-ebook.com/> to convert novel file into epub/epub/..., default filename format is [writer]-[bookname].[type]
 
 使用calibre将下载的 html格式 的小说转换成 其他格式的电子书，例如epub、epub等等。如果未指定writer及book选项，则需要将html源文件名称设置为 [作者-书名]
 
-    conv_novel.pl -f [input_file] -o [output_file] -t [type] -w [writer] -b [book]
-    conv_novel.pl -f [源文件] -o [目标文件] -t [目标文件类型(小写)] -w [作者] -b [书名]
+    get_novel.pl -f [input_file] -o [output_file] -t [type] -w [writer] -b [book]
+    get_novel.pl -f [源文件] -o [目标文件] -t [目标文件类型(小写)] -w [作者] -b [书名]
 
-    conv_novel.pl -f 天平-风起阿房.html -t epub
-    conv_novel.pl -f mxj.html -w 施定柔 -b 迷侠记 -t epub
+    get_novel.pl -f 天平-风起阿房.html -t epub
+    get_novel.pl -f mxj.html -w 施定柔 -b 迷侠记 -t epub
 
 =head2 send email 
 
@@ -216,7 +216,6 @@ manually select some novels, use parallel for multiple novels download
     parallel --colsep , get_novel.pl -u "{3}" -t epub :::: refine_booklist.txt
 
 =head1 FUNCTION
-
 
     my $xs = Novel::Robot->new(
     site => 'jjwxc',

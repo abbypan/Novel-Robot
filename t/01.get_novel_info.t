@@ -2,7 +2,7 @@
 use lib '../lib';
 use Novel::Robot;
 use Test::More;
-use Data::Dumper;
+#use Data::Dumper;
 use Encode::Locale;
 use Encode;
 

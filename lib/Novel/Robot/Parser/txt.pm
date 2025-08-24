@@ -8,10 +8,10 @@
 =head2 parse_novel
 
 解析txt
-  
+
   my $txt_content_ref = $self->parse_novel(
     [ '/somedir/', '/someotherdir/somefile.txt' ], 
-	writer => 'some_writer',
+    writer => 'some_writer',
     book => 'some_book',
     chapter_regex => qr/(第\d+章)/, 
    );
@@ -63,9 +63,9 @@ sub get_default_chapter_regex {
 
     #序号
     my $r_num =
-qr/[０１２３４５６７８９零○〇一二三四五六七八九十百千\d]+/;
+    qr/[０１２３４５６７８９零○〇一二三四五六七八九十百千\d]+/;
     my $r_split = qr/[上中下]/;
-	my $r_not_chap_head = qr/引子|楔子|尾声|内容简介|正文|番外|终章|序言|后记|文案/;
+    my $r_not_chap_head = qr/引子|楔子|尾声|内容简介|正文|番外|终章|序言|后记|文案/;
 
     #第x章，卷x，第x章(大结局)，尾声x
     my $r_head = qr/(卷|第|$r_not_chap_head)?/;
@@ -89,14 +89,14 @@ qr/[０１２３４５６７８９零○〇一二三四五六七八九十百千\
     #第x卷/第x章 xxx
     my $regex_d = qr/($regex_a(\s+.{0,10})?){2}/;
 
-	#后记 xxx
-	my $regex_e = qr/(【?$r_not_chap_head\s*$r_post】?)/;
+    #后记 xxx
+    my $regex_e = qr/(【?$r_not_chap_head\s*$r_post】?)/;
 
-	#总体
+    #总体
     my $chap_r = qr/^\s*($regex_a|$regex_b|$regex_c|$regex_d|$regex_e)\s*$/m;
 
     return $chap_r;
- }
+}
 
 
 
