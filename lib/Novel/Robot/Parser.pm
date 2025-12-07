@@ -196,10 +196,10 @@ sub parse_novel {
       { path  => '//meta[@property="og:novel:book_name"]', extract => '@content' },
       { path  => '//meta[@property="og:title"]',           extract => '@content' },
       { path  => '//div[@id="title"]', },
-      { path  => '//div[@class="title"]', },
       { regex => qr#<title>[^<]+?([^,<]+?)全文阅读,#si, },
       { regex => qr#<title>[^<]*?《([^,<]+?)》#si, },
       { regex => qr#<title>[^<]+?,([^,<]+?)最新章节#si, },
+      { path  => '//div[@class="title"]', },
       { path  => '//h1', },
       { path  => '//h2', },
     ],
@@ -209,7 +209,7 @@ sub parse_novel {
   $r->{writer} ||= $self->scrape_element_try(
     $h,
     [ { path => '//meta[@name="author"]', extract => '@content' },
-
+        { path => '//meta[@name="Author"]', extract => '@content' },
       { path  => '//meta[@name="og:novel:author"]',     extract => '@content' },
       { path  => '//meta[@property="og:novel:author"]', extract => '@content' },
       { path  => '//*[@class="author"]', },
