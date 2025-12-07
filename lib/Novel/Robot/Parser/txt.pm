@@ -68,10 +68,12 @@ sub get_default_chapter_regex {
     my $r_not_chap_head = qr/引子|楔子|尾声|内容简介|正文|番外|终章|序言|后记|文案/;
 
     #第x章，卷x，第x章(大结局)，尾声x
-    my $r_head = qr/(卷|第|$r_not_chap_head)?/;
-    my $r_tail  = qr/(章|卷|回|部|折)?/;
+    my $r_head = qr/(卷|第|$r_not_chap_head)/;
+    my $r_tail  = qr/(章|卷|回|部|折)/;
     my $r_post  = qr/([.\s\-\(\/（]+.{0,35})?/;
-    my $regex_a = qr/(【?$r_head\s*$r_num\s*$r_tail$r_post】?)/;
+    my $regex_a = qr/(【?$r_head?\s*$r_num\s*$r_tail?$r_post】?)/;
+
+    my $regex_a2 = qr/($r_head$r_num$r_tail[^。]{0,35})/;
 
     #(1)，(1)xxx
     #xxx(1)，xxx(1)yyy
@@ -93,7 +95,7 @@ sub get_default_chapter_regex {
     my $regex_e = qr/(【?$r_not_chap_head\s*$r_post】?)/;
 
     #总体
-    my $chap_r = qr/^\s*($regex_a|$regex_b|$regex_c|$regex_d|$regex_e)\s*$/m;
+    my $chap_r = qr/^\s*($regex_a|$regex_a2|$regex_b|$regex_c|$regex_d|$regex_e)\s*$/m;
 
     return $chap_r;
 }
