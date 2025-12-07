@@ -19,6 +19,9 @@ use IO::Uncompress::Gunzip qw(gunzip);
 use Term::ProgressBar;
 use URI::Escape;
 use URI;
+use Firefox::Marionette();
+
+use Smart::Comments;
 
 our $DEFAULT_URL_CONTENT = '';
 our %DEFAULT_HEADER      = (
@@ -36,8 +39,14 @@ sub new {
   my ( $self, %opt ) = @_;
   $opt{retry}           ||= 5;
   $opt{max_process_num} ||= 5;
-  $opt{browser}         ||= _init_browser( $opt{browser_headers} );
+
   $opt{use_chrome}      ||= 0;
+  $opt{use_firefox}      ||= 0;
+  #if($opt{use_firefox}){
+      #$opt{browser_agent} = Firefox::Marionette->new();
+  #}
+
+  $opt{browser_agent}         ||= _init_browser( $opt{browser_headers} );
   bless {%opt}, __PACKAGE__;
 }
 
@@ -200,33 +209,49 @@ sub request_url_simple {
   my ( $self, $url, $form ) = @_;
 
   my $res;
-  if ( $form ) {
-    $res = $self->{browser}->request(
+  if ( $self->{use_firefox} ) {
+      #$self->{browser_agent}->go($url);
+      #sleep 5;
+      #$res->{content} = $self->{browser_agent}->html();
+      my $firefox = Firefox::Marionette->new()->go($url);
+      sleep 5;
+      $res->{content} = $firefox->html();
+
+      $res->{success} = 1;
+  } elsif ( $self->{use_chrome} ) {
+    $res->{content} = `chrome --no-sandbox --user-data-dir --headless --disable-gpu --dump-dom "$url" 2>/dev/null`;
+    $res->{success} = 1;
+} elsif ( $form ) {
+    $res = $self->{browser_agent}->request(
       'POST', $url,
       { content => $self->format_post_content( $form ),
         headers => {
           'content-type' => 'application/x-www-form-urlencoded',
         },
       } );
-  } elsif ( $self->{use_chrome} ) {
-    $res->{content} = `chrome --no-sandbox --user-data-dir --headless --disable-gpu --dump-dom "$url" 2>/dev/null`;
-    $res->{success} = 1;
   } else {
-    $res = $self->{browser}->get( $url );
+    $res = $self->{browser_agent}->get( $url );
   }
   return $DEFAULT_URL_CONTENT unless ( $res->{success} );
 
-  my $html;
+
+
   my $content = $res->{content};
-  if (  $res->{headers}{'content-encoding'}
-    and $res->{headers}{'content-encoding'} eq 'gzip' ) {
-    gunzip \$content => \$html, MultiStream => 1, Append => 1;
+
+  unless($self->{use_firefox} or $self->{use_chrome}){
+      my $html;
+      if ( 
+          $res->{headers} 
+              and $res->{headers}{'content-encoding'}
+              and $res->{headers}{'content-encoding'} eq 'gzip' ) {
+          gunzip \$content => \$html, MultiStream => 1, Append => 1;
+      }
+
+      my $charset = detect( $html || $content );
+      $content = decode( $charset, $html || $content, Encode::FB_XMLCREF );
   }
 
-  my $charset = detect( $html || $content );
-  my $r = decode( $charset, $html || $content, Encode::FB_XMLCREF );
-
-  return $r || $DEFAULT_URL_CONTENT;
+  return $content || $DEFAULT_URL_CONTENT;
 } ## end sub request_url_simple
 
 sub read_moz_cookie {
@@ -249,7 +274,7 @@ sub read_moz_cookie {
   @segment = grep { defined $_->[6] and $_->[6] =~ /\S/ } @segment;
 
   my @jar = map { "$_->[5]=$_->[6]; Domain=$_->[0]; Path=$_->[2]; Expiry=$_->[4]" } @segment;
-  $self->{browser}{cookie_jar}->load_cookies( @jar );
+  $self->{browser_agent}{cookie_jar}->load_cookies( @jar );
 
   $cookie = join( "; ", map { "$_->[5]=$_->[6]" } @segment );
 

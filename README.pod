@@ -58,6 +58,7 @@ for example, on debian, 以debian环境为例
     -v : verbose
     --progress: 显示进度条(默认不显示)
 
+    --use_firefox      : use firefox dump_dom, only support GET method
     --use_chrome      : use chrome dump_dom, only support GET method
     --with_toc        : 小说保存时是否生成目录(默认是)
     --grep_content    : 提取关键字

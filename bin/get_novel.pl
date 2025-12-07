@@ -27,6 +27,7 @@ GetOptions(
     'progress',
 
     'use_chrome',
+    'use_firefox', 
     'with_toc', 'grep_content=s', 'filter_content=s', 'only_poster', 'min_content_word_num=i',
     'max_process_num=i',
     'chapter_regex=s',
