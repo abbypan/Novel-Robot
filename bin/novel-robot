@@ -101,7 +101,6 @@ sub send_novel {
     $msg=~s#^.*/##;
 
     my $cmd = qq[calibre-smtp -a "$outfname" -s "$msg" --relay $o{mail_server} --port $o{mail_port} -u "$o{mail_usr}" -p "$o{mail_pwd}" "$o{mail_from}" "$o{mail_to}" "$msg"];
-    print encode(locale=>$cmd), "\n";
     print $cmd, "\n";
 
     system( $cmd );
