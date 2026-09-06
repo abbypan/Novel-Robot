@@ -162,6 +162,7 @@ sub parse_novel {
 			{ regex => qr#<title>[^<,]+?最新章节\(([^<,]+?)\),#si, },
 			{ regex => qr#<title>[^<,]+?作者：([^<,]+?)_#si, },
 			{ regex => qr#content="[^"]+?,([^",]+?)作品#s, },
+			{ regex => qr#>作者：([^<,]+?)<#si, },
 		],
 		#sub => $self->can( "tidy_writer_book" ),
 	);

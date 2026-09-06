@@ -14,7 +14,6 @@ use HTTP::CookieJar;
 use HTTP::Tiny;
 use IO::Uncompress::Gunzip qw(gunzip);
 use URI::Escape;
-use Firefox::Marionette();
 
 
 our $DEFAULT_URL_CONTENT = '';
@@ -24,8 +23,7 @@ our %DEFAULT_HEADER      = (
   'Accept-Encoding' => "gzip",
   'Accept-Language' => 'zh,zh-cn;q=0.8,en-us;q=0.5,en;q=0.3',
   'Connection'      => 'keep-alive',
-  #'User-Agent'      => 'Mozilla/5.0 (Windows NT 6.1; WOW64; rv:29.0) Gecko/20100101 Firefox/29.0',
-  'User-Agent'      => 'User-Agent: MQQBrowser/26 Mozilla/5.0 (Linux; U; Android 2.3.7; zh-cn; MB200 Build/GRJ22; CyanogenMod-7) AppleWebKit/533.1 (KHTML, like Gecko) Version/4.0 Mobile Safari/533.1', 
+	  'User-Agent'      => 'User-Agent: MQQBrowser/26 Mozilla/5.0 (Linux; U; Android 2.3.7; zh-cn; MB200 Build/GRJ22; CyanogenMod-7) AppleWebKit/533.1 (KHTML, like Gecko) Version/4.0 Mobile Safari/533.1', 
   'DNT'             => 1,
 );
 
@@ -63,10 +61,8 @@ sub request_url {
 
 	my $c;
 	for my $i ( 1 .. $self->{retry} ) {
-		if ( $self->{agent} eq 'firefox' ) {
-			$c = $self->request_url_firefox($url);
-		}elsif($self->{agent} eq 'chrome') {
-			$c = $self->request_url_chrome($url);
+			if ( $self->{agent} eq 'chrome' ) {
+				$c = $self->request_url_chrome($url);
 		}else{
 			$c = $self->request_url_tiny($url);
 		}
@@ -82,14 +78,6 @@ sub request_url {
 	return $c;
 }
 
-
-sub request_url_firefox {
-	my ($self, $url) = @_;
-	my $firefox = Firefox::Marionette->new()->go($url);
-	sleep 5;
-	my $c = $firefox->html();
-	return $c;
-}
 
 sub request_url_chrome {
 	my ($self, $url) = @_;

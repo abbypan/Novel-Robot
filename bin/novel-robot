@@ -202,7 +202,7 @@ Usage: novel-robot [options]
 --progress: 显示进度条(默认不显示)
 -h, --help: 显示帮助
 
---agent           : default, firefox (GET), chrome (GET)
+--agent           : default, chrome (GET)
 --with_toc        : 小说保存时是否生成目录(默认是)
 --grep_content    : 提取关键字
 --filter_content  : 过滤关键字

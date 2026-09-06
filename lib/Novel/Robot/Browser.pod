@@ -13,10 +13,10 @@ get/post url, return unicode content, auto detect CJK charset
 =head1 FUNCTION
 
 =head2 request_url
-  
-    my $agent = 'default'; # default, firefox, chrome
+
+    my $agent = 'default'; # default, chrome
     my $browser = Novel::Robot::Browser->new( agent => $agent );
-	
+
 =head3  get
 
     my $url = 'http://www.jjwxc.net/onebook.php?novelid=14838';
@@ -33,7 +33,7 @@ get/post url, return unicode content, auto detect CJK charset
 
 
 =head2 read_moz_cookie
-    
+
     #firefox sqlite3 : cookies.sqlite
     $browser->read_moz_cookie($mozilla_cookies_sqlite_file, $domain);
 

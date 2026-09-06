@@ -24,7 +24,7 @@ L<Novel::Robot::Packer>
 
 for example, on debian, 以debian环境为例
 
-    apt install parallel calibre cpanminus firefox chromium-browser
+    apt install parallel calibre cpanminus chromium-browser
     cpanm Novel::Robot
 
 =head2 EXAMPLE
@@ -62,7 +62,7 @@ for example, on debian, 以debian环境为例
     --progress: 显示进度条(默认不显示)
     -h, --help: 显示帮助
 
-    --agent           : default, firefox (GET), chrome (GET)
+    --agent           : default, chrome (GET)
     --with_toc        : 小说保存时是否生成目录(默认是)
     --grep_content    : 提取关键字
     --filter_content  : 过滤关键字
