@@ -78,7 +78,7 @@ sub get_novel {
 
 	my $dst_f = $self->{packer}->main( $novel_ref, \%o );
 	my $dst_fname = decode(locale=>$dst_f);
-	print encode(locale=>"info: $novel_ref->{writer}-$novel_ref->{book}-$last_item_num\noutput: $dst_fname\nlast_item_num: $last_item_num\n") if ( $o{verbose} );
+	print "info: $novel_ref->{writer}-$novel_ref->{book}-$last_item_num\noutput: $dst_fname\nlast_item_num: $last_item_num\n" if ( $o{verbose} );
 
 	return wantarray ? ( $dst_f, $novel_ref ) : $dst_f;
 } ## end sub get_novel

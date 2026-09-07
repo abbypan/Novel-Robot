@@ -65,7 +65,6 @@ if ( $opt{file} ) {
 } elsif ( $opt{url} ) {
     if ( $opt{not_download} ) { # print novel info, not download
         my $r = $xs->get_novel_info( $opt{url}, %opt, max_page_num => 1 );
-	#print encode(locale=>join( ",", $r->{writer} || '', $r->{book} || $r->{title} || '', $r->{url} || '', $r->{item_num} || '' )), "\n";
         print join( ",", $r->{writer} || '', $r->{book} || $r->{title} || '', $r->{url} || '', $r->{item_num} || '' ), "\n";
     }else{ # download novel/tiezi/page from url
         ( $outf, $bookr ) = $xs->get_novel( $opt{url}, %opt );
@@ -81,8 +80,7 @@ if ( $opt{file} ) {
         my $u = $r->{url};
         next unless($u);
         if ( $opt{not_download} ) {
-		#print encode(locale=>join( ",", $r->{writer} // $info_ref->{writer} // 'unknown', $r->{book} // $r->{title}, $r->{url} )), "\n";
-		print join( ",", $r->{writer} // $info_ref->{writer} // 'unknown', $r->{book} // $r->{title}, $r->{url} ), "\n";
+            print join( ",", $r->{writer} // $info_ref->{writer} // 'unknown', $r->{book} // $r->{title}, $r->{url} ), "\n";
         } else {
             $xs->get_novel( $u, %opt );
         }

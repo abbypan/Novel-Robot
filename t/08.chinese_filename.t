@@ -19,9 +19,14 @@ copy( File::Spec->catfile( $FindBin::RealBin, 'novel-utf8.txt' ), $input )
     or die "copy fixture: $!";
 
 my $bin = File::Spec->catfile( $root, 'bin', 'novel-robot' );
-my $exit = system {
-    $^X
-} $^X, $bin, '-s', 'txt', '-f', $input, '-t', 'html', '-o', $output;
+open my $cli, '-|',
+    $^X, $bin, '-s', 'txt', '-f', $input, '-t', 'html', '-o', $output, '-v'
+    or die "start CLI: $!";
+binmode $cli, ':raw';
+my $stdout = do { local $/; <$cli> };
+close $cli;
+my $exit = $?;
+$stdout = decode( 'UTF-8', $stdout );
 
 is( $exit, 0, 'CLI accepts a Chinese input filename' );
 ok( -s $output, 'CLI creates the requested Chinese output filename' );
@@ -41,5 +46,15 @@ like(
     'derive a Unicode book title from the filename',
 );
 like( $html, qr{中国}, 'preserve Unicode chapter content' );
+like(
+    $stdout,
+    qr{info: 牵机-断情逐妖记-3},
+    'verbose output preserves the Unicode writer and book title',
+);
+like(
+    $stdout,
+    qr{output: \Q$output\E},
+    'verbose output preserves the Unicode output filename',
+);
 
 done_testing;
